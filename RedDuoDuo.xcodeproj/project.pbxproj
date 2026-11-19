@@ -1,0 +1,692 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		05B5A4E5674AD468C71C5DB4 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02708EDD522230F6928EFC15 /* HomeView.swift */; };
+		062CC3A45C6E9F60A02B5142 /* DuoFoldLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD740BA73B14C8F34668B4E /* DuoFoldLayout.swift */; };
+		0678D2A887F2028495738BA4 /* HGCurrentPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E56B5F914BA5856ACEF2934B /* HGCurrentPlayer.swift */; };
+		07289549FE0EC62AB8BD66A5 /* SpadeKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28073438F2E446E0706B246A /* SpadeKey.swift */; };
+		07A355D943C7CBD375BE6493 /* ByteUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED1331A34D6CA130D94D6C9F /* ByteUtils.swift */; };
+		11F5A88C22D41EDC4B438D86 /* AppLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A6B1FD2F25F9748AA475CA3 /* AppLog.swift */; };
+		18147DC669BD39CB320E98D2 /* HGCurrentPlayer-Apache-2.0.txt in Resources */ = {isa = PBXBuildFile; fileRef = 41817CA6676BA57DA5E4AD00 /* HGCurrentPlayer-Apache-2.0.txt */; };
+		18C1230083C71B6A4B741A1A /* HGCurrentProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2960607904671B27EF194708 /* HGCurrentProfile.swift */; };
+		192DF73204368B1A8B9DDD5B /* AVPlayerBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B9BA470861AC55E81F206A /* AVPlayerBridge.swift */; };
+		199F00C1D610A3D1534560F5 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFF0A076CDC51C211FBE895C /* HistoryView.swift */; };
+		19DC7E83CE06FEACB91E3BE0 /* THIRD_PARTY_NOTICES.md in Resources */ = {isa = PBXBuildFile; fileRef = B8EACED48ACDD317B2ACB757 /* THIRD_PARTY_NOTICES.md */; };
+		1AE3F2E2ACA99A4D093561A1 /* GoldenHookFeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8692A58B0E12638D39E8DE7 /* GoldenHookFeedView.swift */; };
+		2C78C7E6CF697FEA75D0E389 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 39CAD32277B6B22966259AAE /* LICENSE */; };
+		2DCA50F85FC501572A56F15F /* EpisodePreloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E0D8E4896C95201868FF13 /* EpisodePreloader.swift */; };
+		2E0931A88EA492A833C9340E /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D3DE5D24CF8275A04646AC /* ProfileView.swift */; };
+		2EFA6B408155F05F2425CC24 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66311E488D7B0E4DF5251239 /* Models.swift */; };
+		2FA1EA2363B2C8E928EA08B6 /* RDPlayerGestureOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4592AA9BDAFC3795C95333B4 /* RDPlayerGestureOverlay.swift */; };
+		30EBAE3CA1154AA57370F758 /* RDPlayerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E93344EF0194C4E921A3312 /* RDPlayerController.swift */; };
+		343F773B3D084B006DFD6DE6 /* VLCPlayerBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3403D1815AE83514C0BA9528 /* VLCPlayerBridge.swift */; };
+		36CEBE1AEF87B7F6A1A00BD8 /* Medusa.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB25158567F4262C0DDFFFB /* Medusa.swift */; };
+		5E8D6C5E1E337C6B16FBB2C7 /* RedDuoDuoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F96068B68923BCBE51794AA /* RedDuoDuoApp.swift */; };
+		6010ED88E803852559E05E1D /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95F051D5A3DA264F3436DE38 /* PlayerView.swift */; };
+		711E3850D7B18A38E349ADD4 /* RDVideoFit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 973552E8126D95B92310AD01 /* RDVideoFit.swift */; };
+		7FDFEF8B1DE3076633FCC957 /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5E9C48F9751BEA7C3B86B08 /* SearchView.swift */; };
+		80D71444DB7142FB029BCE05 /* VLCKit-LGPL-2.1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 42B2BBB8E4E3BA34F4EAD04F /* VLCKit-LGPL-2.1.txt */; };
+		96C79D3FEB550949D191DEE6 /* ManjuAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1138449F1707C21C6698CDC /* ManjuAPI.swift */; };
+		A2D7F23BE144E8576F1CCE0A /* HistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8375C4C31EF0C324A625C8D7 /* HistoryStore.swift */; };
+		A48C803115B0294631190F04 /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BFDD11EE81F8955B11AD140 /* DetailView.swift */; };
+		AA3C2593C719F952A43C3482 /* CENCDecryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC880DB07AF3E60E981D7C67 /* CENCDecryptor.swift */; };
+		AAE487F5845BFF477C559E00 /* RDPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CEF0CDAD0945D26CA5BE1E /* RDPreferences.swift */; };
+		ABB1BF295D8CD87F3A570864 /* HGPlayerSign.swift in Sources */ = {isa = PBXBuildFile; fileRef = 064F64163CB2D77819F4C272 /* HGPlayerSign.swift */; };
+		AC9BBDB73D6BAF78B259E5F1 /* DouDuo-MIT.txt in Resources */ = {isa = PBXBuildFile; fileRef = F8F2DCD4445794E19FA1F9D5 /* DouDuo-MIT.txt */; };
+		B1D79657F657778FFF806874 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0CA1F0AECC68415DE5C231 /* LoginView.swift */; };
+		B2851612622D2935C7A486DB /* StreamPreparer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 294337A26DD07A980D01088D /* StreamPreparer.swift */; };
+		B97E4DE94ACAB6A7A332596D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 42D836F051F15F33693E7A2D /* Assets.xcassets */; };
+		B9928A5CF53BEA5ED6788C0D /* VLCKitSPM in Frameworks */ = {isa = PBXBuildFile; productRef = 7FF1BD12CB0AD70995CE186F /* VLCKitSPM */; };
+		BA69A2434C1BB3051AC029D4 /* RedDuoDuoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1E41B6809D39DC3092806F9 /* RedDuoDuoTests.swift */; };
+		BAA34C5B3A023E81FA87951B /* NowPlayingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAD07A150F4C8CC405037975 /* NowPlayingService.swift */; };
+		C596ED62F8DFFF69CE30AE93 /* RDHaptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42BDAF47A6653D66A6964A38 /* RDHaptics.swift */; };
+		D4E21BC1D764CAD1DE094E9D /* SessionKeychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4003D54F20C3A0F9AD3CAC /* SessionKeychain.swift */; };
+		D7113214DF6D949BFEA1FA5B /* HGCurrentPlayer-NOTICE.md in Resources */ = {isa = PBXBuildFile; fileRef = DD28D4F5E983F4C756D39E0E /* HGCurrentPlayer-NOTICE.md */; };
+		DA86EF8CC679A919F4A14B1B /* AuthStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD0712F726D85F7318DA4454 /* AuthStore.swift */; };
+		DCD93F80F928B5FE81C53CD4 /* OfflineCacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F285518362DC5AD4034982A1 /* OfflineCacheManager.swift */; };
+		E2AD1FD7D10484706F1F5ABD /* RDPlayerSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5125D6D63C3BE741F8F03C39 /* RDPlayerSurface.swift */; };
+		ED021DF80FB6628ABB3D978D /* PlayerSubViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CFA109CF474ACB6F0031B04 /* PlayerSubViews.swift */; };
+		F0C8BCE8AAB2A5133452C18E /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = F535ADA4F7FCE8D3AAC426FD /* Theme.swift */; };
+		FB6743F6CCD0FD219A71E15D /* CachedAsyncImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1313659E6A96D21F1131FD2F /* CachedAsyncImage.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		E384D3EF9C02CFF46AFD0FB0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6AA4422F2BA6A7B099CEBF3B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D1A8216A29C40804333D0731;
+			remoteInfo = RedDuoDuo;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		02708EDD522230F6928EFC15 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		064F64163CB2D77819F4C272 /* HGPlayerSign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HGPlayerSign.swift; sourceTree = "<group>"; };
+		09D3DE5D24CF8275A04646AC /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		1313659E6A96D21F1131FD2F /* CachedAsyncImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedAsyncImage.swift; sourceTree = "<group>"; };
+		1B0CA1F0AECC68415DE5C231 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		1BFDD11EE81F8955B11AD140 /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
+		28073438F2E446E0706B246A /* SpadeKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpadeKey.swift; sourceTree = "<group>"; };
+		28E0D8E4896C95201868FF13 /* EpisodePreloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodePreloader.swift; sourceTree = "<group>"; };
+		294337A26DD07A980D01088D /* StreamPreparer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamPreparer.swift; sourceTree = "<group>"; };
+		2960607904671B27EF194708 /* HGCurrentProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HGCurrentProfile.swift; sourceTree = "<group>"; };
+		2E93344EF0194C4E921A3312 /* RDPlayerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RDPlayerController.swift; sourceTree = "<group>"; };
+		3403D1815AE83514C0BA9528 /* VLCPlayerBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLCPlayerBridge.swift; sourceTree = "<group>"; };
+		39CAD32277B6B22966259AAE /* LICENSE */ = {isa = PBXFileReference; path = LICENSE; sourceTree = "<group>"; };
+		41817CA6676BA57DA5E4AD00 /* HGCurrentPlayer-Apache-2.0.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "HGCurrentPlayer-Apache-2.0.txt"; sourceTree = "<group>"; };
+		42B2BBB8E4E3BA34F4EAD04F /* VLCKit-LGPL-2.1.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "VLCKit-LGPL-2.1.txt"; sourceTree = "<group>"; };
+		42BDAF47A6653D66A6964A38 /* RDHaptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RDHaptics.swift; sourceTree = "<group>"; };
+		42D836F051F15F33693E7A2D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		4592AA9BDAFC3795C95333B4 /* RDPlayerGestureOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RDPlayerGestureOverlay.swift; sourceTree = "<group>"; };
+		46CEF0CDAD0945D26CA5BE1E /* RDPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RDPreferences.swift; sourceTree = "<group>"; };
+		4BB25158567F4262C0DDFFFB /* Medusa.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Medusa.swift; sourceTree = "<group>"; };
+		4E4003D54F20C3A0F9AD3CAC /* SessionKeychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionKeychain.swift; sourceTree = "<group>"; };
+		5125D6D63C3BE741F8F03C39 /* RDPlayerSurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RDPlayerSurface.swift; sourceTree = "<group>"; };
+		536BBF63712872494EF4EBC3 /* RedDuoDuo.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = RedDuoDuo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		55EE840FCE239C97756B92C5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		5F96068B68923BCBE51794AA /* RedDuoDuoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedDuoDuoApp.swift; sourceTree = "<group>"; };
+		6080C14407D3258C1E1A7383 /* VLCKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = VLCKit; path = Vendor/VLCKit; sourceTree = SOURCE_ROOT; };
+		66311E488D7B0E4DF5251239 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		7A6B1FD2F25F9748AA475CA3 /* AppLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLog.swift; sourceTree = "<group>"; };
+		8375C4C31EF0C324A625C8D7 /* HistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryStore.swift; sourceTree = "<group>"; };
+		8860E276B666C257A2B74ACF /* RedDuoDuoUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = RedDuoDuoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		94B9BA470861AC55E81F206A /* AVPlayerBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVPlayerBridge.swift; sourceTree = "<group>"; };
+		95F051D5A3DA264F3436DE38 /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
+		973552E8126D95B92310AD01 /* RDVideoFit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RDVideoFit.swift; sourceTree = "<group>"; };
+		9CFA109CF474ACB6F0031B04 /* PlayerSubViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerSubViews.swift; sourceTree = "<group>"; };
+		A1E41B6809D39DC3092806F9 /* RedDuoDuoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedDuoDuoTests.swift; sourceTree = "<group>"; };
+		A8692A58B0E12638D39E8DE7 /* GoldenHookFeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoldenHookFeedView.swift; sourceTree = "<group>"; };
+		AC880DB07AF3E60E981D7C67 /* CENCDecryptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CENCDecryptor.swift; sourceTree = "<group>"; };
+		B8EACED48ACDD317B2ACB757 /* THIRD_PARTY_NOTICES.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = THIRD_PARTY_NOTICES.md; sourceTree = "<group>"; };
+		BCD740BA73B14C8F34668B4E /* DuoFoldLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuoFoldLayout.swift; sourceTree = "<group>"; };
+		BD0712F726D85F7318DA4454 /* AuthStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthStore.swift; sourceTree = "<group>"; };
+		CAD07A150F4C8CC405037975 /* NowPlayingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingService.swift; sourceTree = "<group>"; };
+		DD28D4F5E983F4C756D39E0E /* HGCurrentPlayer-NOTICE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "HGCurrentPlayer-NOTICE.md"; sourceTree = "<group>"; };
+		E56B5F914BA5856ACEF2934B /* HGCurrentPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HGCurrentPlayer.swift; sourceTree = "<group>"; };
+		E5E9C48F9751BEA7C3B86B08 /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
+		ED1331A34D6CA130D94D6C9F /* ByteUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ByteUtils.swift; sourceTree = "<group>"; };
+		EFF0A076CDC51C211FBE895C /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		F1138449F1707C21C6698CDC /* ManjuAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManjuAPI.swift; sourceTree = "<group>"; };
+		F285518362DC5AD4034982A1 /* OfflineCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfflineCacheManager.swift; sourceTree = "<group>"; };
+		F535ADA4F7FCE8D3AAC426FD /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		F8F2DCD4445794E19FA1F9D5 /* DouDuo-MIT.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "DouDuo-MIT.txt"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		CC2788B53A51B44B9738E231 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B9928A5CF53BEA5ED6788C0D /* VLCKitSPM in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1B592B41DAC6782A82BB69EF /* Licenses */ = {
+			isa = PBXGroup;
+			children = (
+				F8F2DCD4445794E19FA1F9D5 /* DouDuo-MIT.txt */,
+				41817CA6676BA57DA5E4AD00 /* HGCurrentPlayer-Apache-2.0.txt */,
+				DD28D4F5E983F4C756D39E0E /* HGCurrentPlayer-NOTICE.md */,
+				42B2BBB8E4E3BA34F4EAD04F /* VLCKit-LGPL-2.1.txt */,
+			);
+			path = Licenses;
+			sourceTree = "<group>";
+		};
+		1D24E8822302690909039841 /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				1313659E6A96D21F1131FD2F /* CachedAsyncImage.swift */,
+				F535ADA4F7FCE8D3AAC426FD /* Theme.swift */,
+			);
+			path = Theme;
+			sourceTree = "<group>";
+		};
+		356B6CCC087FC282039903CA /* RedDuoDuo */ = {
+			isa = PBXGroup;
+			children = (
+				7A6B1FD2F25F9748AA475CA3 /* AppLog.swift */,
+				42D836F051F15F33693E7A2D /* Assets.xcassets */,
+				BD0712F726D85F7318DA4454 /* AuthStore.swift */,
+				8375C4C31EF0C324A625C8D7 /* HistoryStore.swift */,
+				55EE840FCE239C97756B92C5 /* Info.plist */,
+				F1138449F1707C21C6698CDC /* ManjuAPI.swift */,
+				66311E488D7B0E4DF5251239 /* Models.swift */,
+				5F96068B68923BCBE51794AA /* RedDuoDuoApp.swift */,
+				4E4003D54F20C3A0F9AD3CAC /* SessionKeychain.swift */,
+				EF79BA1E898EC83AD0C4D7CB /* Net */,
+				44E60CC3D7D6BDF2ED035BA3 /* Player */,
+				AF67BE7DC61EFE821C87AAD0 /* Services */,
+				1D24E8822302690909039841 /* Theme */,
+				3A4C8B0FC2317203A0C60419 /* Views */,
+			);
+			path = RedDuoDuo;
+			sourceTree = "<group>";
+		};
+		3A4C8B0FC2317203A0C60419 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				1BFDD11EE81F8955B11AD140 /* DetailView.swift */,
+				A8692A58B0E12638D39E8DE7 /* GoldenHookFeedView.swift */,
+				EFF0A076CDC51C211FBE895C /* HistoryView.swift */,
+				02708EDD522230F6928EFC15 /* HomeView.swift */,
+				1B0CA1F0AECC68415DE5C231 /* LoginView.swift */,
+				9CFA109CF474ACB6F0031B04 /* PlayerSubViews.swift */,
+				95F051D5A3DA264F3436DE38 /* PlayerView.swift */,
+				09D3DE5D24CF8275A04646AC /* ProfileView.swift */,
+				E5E9C48F9751BEA7C3B86B08 /* SearchView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		44E60CC3D7D6BDF2ED035BA3 /* Player */ = {
+			isa = PBXGroup;
+			children = (
+				94B9BA470861AC55E81F206A /* AVPlayerBridge.swift */,
+				AC880DB07AF3E60E981D7C67 /* CENCDecryptor.swift */,
+				2E93344EF0194C4E921A3312 /* RDPlayerController.swift */,
+				4592AA9BDAFC3795C95333B4 /* RDPlayerGestureOverlay.swift */,
+				5125D6D63C3BE741F8F03C39 /* RDPlayerSurface.swift */,
+				973552E8126D95B92310AD01 /* RDVideoFit.swift */,
+				294337A26DD07A980D01088D /* StreamPreparer.swift */,
+				3403D1815AE83514C0BA9528 /* VLCPlayerBridge.swift */,
+			);
+			path = Player;
+			sourceTree = "<group>";
+		};
+		5206F78C07CBE7D1D3F419AD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				536BBF63712872494EF4EBC3 /* RedDuoDuo.app */,
+				8860E276B666C257A2B74ACF /* RedDuoDuoUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		ACD3D8F156D7152E46654795 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				6080C14407D3258C1E1A7383 /* VLCKit */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		AF67BE7DC61EFE821C87AAD0 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				BCD740BA73B14C8F34668B4E /* DuoFoldLayout.swift */,
+				28E0D8E4896C95201868FF13 /* EpisodePreloader.swift */,
+				CAD07A150F4C8CC405037975 /* NowPlayingService.swift */,
+				F285518362DC5AD4034982A1 /* OfflineCacheManager.swift */,
+				42BDAF47A6653D66A6964A38 /* RDHaptics.swift */,
+				46CEF0CDAD0945D26CA5BE1E /* RDPreferences.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		DABC8879023CC65CCFFBB670 = {
+			isa = PBXGroup;
+			children = (
+				39CAD32277B6B22966259AAE /* LICENSE */,
+				B8EACED48ACDD317B2ACB757 /* THIRD_PARTY_NOTICES.md */,
+				1B592B41DAC6782A82BB69EF /* Licenses */,
+				ACD3D8F156D7152E46654795 /* Packages */,
+				356B6CCC087FC282039903CA /* RedDuoDuo */,
+				DBCDFA745B5D96BF16712F16 /* RedDuoDuoUITests */,
+				5206F78C07CBE7D1D3F419AD /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		DBCDFA745B5D96BF16712F16 /* RedDuoDuoUITests */ = {
+			isa = PBXGroup;
+			children = (
+				A1E41B6809D39DC3092806F9 /* RedDuoDuoTests.swift */,
+			);
+			path = RedDuoDuoUITests;
+			sourceTree = "<group>";
+		};
+		EF79BA1E898EC83AD0C4D7CB /* Net */ = {
+			isa = PBXGroup;
+			children = (
+				ED1331A34D6CA130D94D6C9F /* ByteUtils.swift */,
+				E56B5F914BA5856ACEF2934B /* HGCurrentPlayer.swift */,
+				2960607904671B27EF194708 /* HGCurrentProfile.swift */,
+				064F64163CB2D77819F4C272 /* HGPlayerSign.swift */,
+				4BB25158567F4262C0DDFFFB /* Medusa.swift */,
+				28073438F2E446E0706B246A /* SpadeKey.swift */,
+			);
+			path = Net;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		97E7E6BDD60D3A7139051207 /* RedDuoDuoUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3D77A2EC9D0AFEDF916BA859 /* Build configuration list for PBXNativeTarget "RedDuoDuoUITests" */;
+			buildPhases = (
+				FB3D8D419F28CEE92FF03B67 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				098E28E317D459C929AA7059 /* PBXTargetDependency */,
+			);
+			name = RedDuoDuoUITests;
+			packageProductDependencies = (
+			);
+			productName = RedDuoDuoUITests;
+			productReference = 8860E276B666C257A2B74ACF /* RedDuoDuoUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		D1A8216A29C40804333D0731 /* RedDuoDuo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9291CAB7F8972CBE04099D94 /* Build configuration list for PBXNativeTarget "RedDuoDuo" */;
+			buildPhases = (
+				BEDD56A9F512257E0A5DA973 /* Sources */,
+				91058911E1E93C26C967426E /* Resources */,
+				CC2788B53A51B44B9738E231 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = RedDuoDuo;
+			packageProductDependencies = (
+				7FF1BD12CB0AD70995CE186F /* VLCKitSPM */,
+			);
+			productName = RedDuoDuo;
+			productReference = 536BBF63712872494EF4EBC3 /* RedDuoDuo.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6AA4422F2BA6A7B099CEBF3B /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					97E7E6BDD60D3A7139051207 = {
+						ProvisioningStyle = Automatic;
+						TestTargetID = D1A8216A29C40804333D0731;
+					};
+					D1A8216A29C40804333D0731 = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 4AB9FFA475A3FDE1D3AC2379 /* Build configuration list for PBXProject "RedDuoDuo" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = DABC8879023CC65CCFFBB670;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				4DB2135BCADDE3FC25EAAD14 /* XCLocalSwiftPackageReference "Vendor/VLCKit" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 5206F78C07CBE7D1D3F419AD /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D1A8216A29C40804333D0731 /* RedDuoDuo */,
+				97E7E6BDD60D3A7139051207 /* RedDuoDuoUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		91058911E1E93C26C967426E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B97E4DE94ACAB6A7A332596D /* Assets.xcassets in Resources */,
+				AC9BBDB73D6BAF78B259E5F1 /* DouDuo-MIT.txt in Resources */,
+				18147DC669BD39CB320E98D2 /* HGCurrentPlayer-Apache-2.0.txt in Resources */,
+				D7113214DF6D949BFEA1FA5B /* HGCurrentPlayer-NOTICE.md in Resources */,
+				2C78C7E6CF697FEA75D0E389 /* LICENSE in Resources */,
+				19DC7E83CE06FEACB91E3BE0 /* THIRD_PARTY_NOTICES.md in Resources */,
+				80D71444DB7142FB029BCE05 /* VLCKit-LGPL-2.1.txt in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		BEDD56A9F512257E0A5DA973 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				192DF73204368B1A8B9DDD5B /* AVPlayerBridge.swift in Sources */,
+				11F5A88C22D41EDC4B438D86 /* AppLog.swift in Sources */,
+				DA86EF8CC679A919F4A14B1B /* AuthStore.swift in Sources */,
+				07A355D943C7CBD375BE6493 /* ByteUtils.swift in Sources */,
+				AA3C2593C719F952A43C3482 /* CENCDecryptor.swift in Sources */,
+				FB6743F6CCD0FD219A71E15D /* CachedAsyncImage.swift in Sources */,
+				A48C803115B0294631190F04 /* DetailView.swift in Sources */,
+				062CC3A45C6E9F60A02B5142 /* DuoFoldLayout.swift in Sources */,
+				2DCA50F85FC501572A56F15F /* EpisodePreloader.swift in Sources */,
+				1AE3F2E2ACA99A4D093561A1 /* GoldenHookFeedView.swift in Sources */,
+				0678D2A887F2028495738BA4 /* HGCurrentPlayer.swift in Sources */,
+				18C1230083C71B6A4B741A1A /* HGCurrentProfile.swift in Sources */,
+				ABB1BF295D8CD87F3A570864 /* HGPlayerSign.swift in Sources */,
+				A2D7F23BE144E8576F1CCE0A /* HistoryStore.swift in Sources */,
+				199F00C1D610A3D1534560F5 /* HistoryView.swift in Sources */,
+				05B5A4E5674AD468C71C5DB4 /* HomeView.swift in Sources */,
+				B1D79657F657778FFF806874 /* LoginView.swift in Sources */,
+				96C79D3FEB550949D191DEE6 /* ManjuAPI.swift in Sources */,
+				36CEBE1AEF87B7F6A1A00BD8 /* Medusa.swift in Sources */,
+				2EFA6B408155F05F2425CC24 /* Models.swift in Sources */,
+				BAA34C5B3A023E81FA87951B /* NowPlayingService.swift in Sources */,
+				DCD93F80F928B5FE81C53CD4 /* OfflineCacheManager.swift in Sources */,
+				ED021DF80FB6628ABB3D978D /* PlayerSubViews.swift in Sources */,
+				6010ED88E803852559E05E1D /* PlayerView.swift in Sources */,
+				2E0931A88EA492A833C9340E /* ProfileView.swift in Sources */,
+				C596ED62F8DFFF69CE30AE93 /* RDHaptics.swift in Sources */,
+				30EBAE3CA1154AA57370F758 /* RDPlayerController.swift in Sources */,
+				2FA1EA2363B2C8E928EA08B6 /* RDPlayerGestureOverlay.swift in Sources */,
+				E2AD1FD7D10484706F1F5ABD /* RDPlayerSurface.swift in Sources */,
+				AAE487F5845BFF477C559E00 /* RDPreferences.swift in Sources */,
+				711E3850D7B18A38E349ADD4 /* RDVideoFit.swift in Sources */,
+				5E8D6C5E1E337C6B16FBB2C7 /* RedDuoDuoApp.swift in Sources */,
+				7FDFEF8B1DE3076633FCC957 /* SearchView.swift in Sources */,
+				D4E21BC1D764CAD1DE094E9D /* SessionKeychain.swift in Sources */,
+				07289549FE0EC62AB8BD66A5 /* SpadeKey.swift in Sources */,
+				B2851612622D2935C7A486DB /* StreamPreparer.swift in Sources */,
+				F0C8BCE8AAB2A5133452C18E /* Theme.swift in Sources */,
+				343F773B3D084B006DFD6DE6 /* VLCPlayerBridge.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FB3D8D419F28CEE92FF03B67 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BA69A2434C1BB3051AC029D4 /* RedDuoDuoTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		098E28E317D459C929AA7059 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D1A8216A29C40804333D0731 /* RedDuoDuo */;
+			targetProxy = E384D3EF9C02CFF46AFD0FB0 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		05FA3A941B9155575CE1ACE5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = RedDuoDuo/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = RedDuoDuo;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.yourname.redduoduo;
+				PRODUCT_NAME = RedDuoDuo;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		3126179AD186FB1C4D2323F3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = RedDuoDuo/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = RedDuoDuo;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.yourname.redduoduo;
+				PRODUCT_NAME = RedDuoDuo;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		7D3B22231329E922E1BA2DFB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGNING_ALLOWED = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.yourname.redduoduo.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = RedDuoDuo;
+			};
+			name = Release;
+		};
+		B7D5F5441929D755FE2768F3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.4.5;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		E175D448F42B2B421D0ACDEF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.4.5;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		F157A29843FA3C54CBC7B93A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGNING_ALLOWED = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.yourname.redduoduo.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = RedDuoDuo;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		3D77A2EC9D0AFEDF916BA859 /* Build configuration list for PBXNativeTarget "RedDuoDuoUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F157A29843FA3C54CBC7B93A /* Debug */,
+				7D3B22231329E922E1BA2DFB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		4AB9FFA475A3FDE1D3AC2379 /* Build configuration list for PBXProject "RedDuoDuo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E175D448F42B2B421D0ACDEF /* Debug */,
+				B7D5F5441929D755FE2768F3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		9291CAB7F8972CBE04099D94 /* Build configuration list for PBXNativeTarget "RedDuoDuo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3126179AD186FB1C4D2323F3 /* Debug */,
+				05FA3A941B9155575CE1ACE5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		4DB2135BCADDE3FC25EAAD14 /* XCLocalSwiftPackageReference "Vendor/VLCKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Vendor/VLCKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		7FF1BD12CB0AD70995CE186F /* VLCKitSPM */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = VLCKitSPM;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 6AA4422F2BA6A7B099CEBF3B /* Project object */;
+}

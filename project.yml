@@ -1,0 +1,82 @@
+name: RedDuoDuo
+options:
+  bundleIdPrefix: com.yourname
+  deploymentTarget:
+    iOS: "26.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+packages:
+  VLCKitSPM:
+    path: Vendor/VLCKit
+settings:
+  base:
+    MARKETING_VERSION: "1.4.5"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.0"
+    CODE_SIGN_STYLE: Automatic
+targets:
+  RedDuoDuo:
+    type: application
+    platform: iOS
+    sources:
+      - path: RedDuoDuo
+      # 二进制分发随附许可（Apache-2.0 §4(a) / MIT / GPL-3.0 §6）：
+      # 把完整许可文本与第三方声明打包进 .app 资源。
+      - path: LICENSE
+        buildPhase: resources
+      - path: THIRD_PARTY_NOTICES.md
+        buildPhase: resources
+      - path: Licenses
+        buildPhase: resources
+    dependencies:
+      - package: VLCKitSPM
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.yourname.redduoduo
+        PRODUCT_NAME: RedDuoDuo
+        INFOPLIST_KEY_CFBundleDisplayName: RedDuoDuo
+        TARGETED_DEVICE_FAMILY: "1"
+        CODE_SIGN_STYLE: Automatic
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
+    info:
+      path: RedDuoDuo/Info.plist
+      properties:
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        NSAppTransportSecurity:
+          NSAllowsArbitraryLoads: true
+        UIBackgroundModes: [audio]
+        CADisableMinimumFrameDurationOnPhone: true
+        UILaunchScreen: {}
+  RedDuoDuoUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: RedDuoDuoUITests
+    dependencies:
+      - target: RedDuoDuo
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.yourname.redduoduo.uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: RedDuoDuo
+        CODE_SIGNING_ALLOWED: NO
+schemes:
+  RedDuoDuo:
+    build:
+      targets:
+        RedDuoDuo: all
+        RedDuoDuoUITests: [test]
+    run:
+      config: Debug
+    test:
+      targets:
+        - RedDuoDuoUITests
+    archive:
+      config: Release
