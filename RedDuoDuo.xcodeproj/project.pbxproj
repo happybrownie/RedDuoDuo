@@ -30,6 +30,7 @@
 		5E8D6C5E1E337C6B16FBB2C7 /* RedDuoDuoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F96068B68923BCBE51794AA /* RedDuoDuoApp.swift */; };
 		6010ED88E803852559E05E1D /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95F051D5A3DA264F3436DE38 /* PlayerView.swift */; };
 		711E3850D7B18A38E349ADD4 /* RDVideoFit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 973552E8126D95B92310AD01 /* RDVideoFit.swift */; };
+		755378ECCD18D1DBD4549632 /* AppearanceMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1001C82C10D067EFF2060BA /* AppearanceMode.swift */; };
 		7FDFEF8B1DE3076633FCC957 /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5E9C48F9751BEA7C3B86B08 /* SearchView.swift */; };
 		80D71444DB7142FB029BCE05 /* VLCKit-LGPL-2.1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 42B2BBB8E4E3BA34F4EAD04F /* VLCKit-LGPL-2.1.txt */; };
 		96C79D3FEB550949D191DEE6 /* ManjuAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1138449F1707C21C6698CDC /* ManjuAPI.swift */; };
@@ -109,6 +110,7 @@
 		BD0712F726D85F7318DA4454 /* AuthStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthStore.swift; sourceTree = "<group>"; };
 		CAD07A150F4C8CC405037975 /* NowPlayingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingService.swift; sourceTree = "<group>"; };
 		DD28D4F5E983F4C756D39E0E /* HGCurrentPlayer-NOTICE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "HGCurrentPlayer-NOTICE.md"; sourceTree = "<group>"; };
+		E1001C82C10D067EFF2060BA /* AppearanceMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceMode.swift; sourceTree = "<group>"; };
 		E56B5F914BA5856ACEF2934B /* HGCurrentPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HGCurrentPlayer.swift; sourceTree = "<group>"; };
 		E5E9C48F9751BEA7C3B86B08 /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
 		ED1331A34D6CA130D94D6C9F /* ByteUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ByteUtils.swift; sourceTree = "<group>"; };
@@ -145,6 +147,7 @@
 		1D24E8822302690909039841 /* Theme */ = {
 			isa = PBXGroup;
 			children = (
+				E1001C82C10D067EFF2060BA /* AppearanceMode.swift */,
 				1313659E6A96D21F1131FD2F /* CachedAsyncImage.swift */,
 				F535ADA4F7FCE8D3AAC426FD /* Theme.swift */,
 			);
@@ -373,6 +376,7 @@
 			files = (
 				192DF73204368B1A8B9DDD5B /* AVPlayerBridge.swift in Sources */,
 				11F5A88C22D41EDC4B438D86 /* AppLog.swift in Sources */,
+				755378ECCD18D1DBD4549632 /* AppearanceMode.swift in Sources */,
 				DA86EF8CC679A919F4A14B1B /* AuthStore.swift in Sources */,
 				07A355D943C7CBD375BE6493 /* ByteUtils.swift in Sources */,
 				AA3C2593C719F952A43C3482 /* CENCDecryptor.swift in Sources */,
@@ -547,7 +551,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.4.6;
+				MARKETING_VERSION = 1.4.7;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -612,7 +616,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.4.6;
+				MARKETING_VERSION = 1.4.7;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;

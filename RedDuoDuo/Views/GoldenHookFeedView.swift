@@ -9,6 +9,7 @@ struct GoldenHookFeedView: View {
 
     @EnvironmentObject private var auth: AuthStore
     @Environment(\.colorScheme) private var systemColorScheme
+    @AppStorage(AppearanceMode.storageKey) private var appearanceMode: AppearanceMode = .system
     @ObservedObject private var catalog = CatalogCache.shared
     @ObservedObject private var followStore = FollowStore.shared
 
@@ -50,6 +51,11 @@ struct GoldenHookFeedView: View {
     private var currentSeries: Series? {
         guard feed.indices.contains(hookIndex) else { return nil }
         return feed[hookIndex]
+    }
+
+    /// 详情 sheet 的有效外观：手动选了浅/深就用所选，跟随系统时才用系统值。
+    private var effectiveColorScheme: ColorScheme {
+        appearanceMode.colorScheme ?? systemColorScheme
     }
 
     var body: some View {
@@ -460,7 +466,7 @@ struct GoldenHookFeedView: View {
             NavigationStack {
                 DetailView(initial: item)
             }
-            .environment(\.colorScheme, systemColorScheme)
+            .environment(\.colorScheme, effectiveColorScheme)
         }
     }
 

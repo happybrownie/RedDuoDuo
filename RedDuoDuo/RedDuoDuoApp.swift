@@ -8,6 +8,7 @@ extension Notification.Name {
 struct RedDuoDuoApp: App {
     @StateObject private var history = WatchHistory.shared
     @StateObject private var auth = AuthStore.shared
+    @AppStorage(AppearanceMode.storageKey) private var appearanceMode: AppearanceMode = .system
 
     init() {
         AppLog.write("APP launch RedDuoDuo \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "-") bundle=\(Bundle.main.bundleIdentifier ?? "-")")
@@ -18,6 +19,8 @@ struct RedDuoDuoApp: App {
             RootTabView()
                 .environmentObject(history)
                 .environmentObject(auth)
+                // 1.4.7 三档外观：system 传 nil 完全跟随系统，light/dark 全 App 立即生效。
+                .preferredColorScheme(appearanceMode.colorScheme)
         }
     }
 }

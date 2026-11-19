@@ -6,6 +6,7 @@ struct ProfileView: View {
     @ObservedObject private var haptics = RDHaptics.shared
     @ObservedObject private var prefs = RDPlaybackPrefs.shared
     @ObservedObject private var offline = OfflineCacheManager.shared
+    @AppStorage(AppearanceMode.storageKey) private var appearanceMode: AppearanceMode = .system
 
     @State private var cloudHistory: [CloudHistoryItem] = []
     @State private var bookshelf: [BookshelfItem] = []
@@ -53,6 +54,7 @@ struct ProfileView: View {
                                             VStack(alignment: .leading, spacing: RD.Space.lg) {
                                                 accountCard
                                                 hapticDensityCard
+                                                appearanceCard
                                                 playbackSettingsCard
                                                 deviceIdentityCard
                                             }
@@ -72,6 +74,7 @@ struct ProfileView: View {
                                         VStack(alignment: .leading, spacing: RD.Space.lg) {
                                             accountCard
                                             hapticDensityCard
+                                            appearanceCard
                                             playbackSettingsCard
                                             offlinePackSection
                                             if auth.isLoggedIn {
@@ -513,6 +516,30 @@ struct ProfileView: View {
         .rdGemCard()
     }
 
+    private var appearanceCard: some View {
+        VStack(alignment: .leading, spacing: RD.Space.md) {
+            RDSectionHeader(title: "外观", trailing: appearanceMode.title, showsChevron: false, accentMark: true)
+
+            Picker("外观", selection: $appearanceMode) {
+                ForEach(AppearanceMode.allCases) { mode in
+                    Text(mode.title).tag(mode)
+                }
+            }
+            .pickerStyle(.segmented)
+            .tint(RD.Palette.accent)
+            .onChange(of: appearanceMode) { _, _ in
+                RDHaptics.shared.playChipSelect()
+            }
+
+            Text("跟随系统时随设备深浅色自动切换；选择浅色或深色后全 App 立即生效。")
+                .font(.caption2)
+                .foregroundStyle(RD.Palette.textTertiary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(RD.Space.lg)
+        .rdGemCard()
+    }
+
     private var playbackSettingsCard: some View {
         VStack(alignment: .leading, spacing: RD.Space.md) {
             RDSectionHeader(title: "追剧与播放偏好", showsChevron: false, accentMark: true)
@@ -702,6 +729,14 @@ struct ProfileView: View {
         .rdGemCard()
     }
 
+    private static var appShortVersion: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—"
+    }
+
+    private static var appBuildVersion: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "—"
+    }
+
     private var deviceIdentityCard: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 6) {
@@ -714,7 +749,7 @@ struct ProfileView: View {
             }
             .padding(.bottom, 2)
 
-            Text("版本：RedDuoDuo 1.4.6 (1)")
+            Text("版本：RedDuoDuo \(Self.appShortVersion) (\(Self.appBuildVersion))")
             Text("固定设备 ID：\(deviceID.isEmpty ? (auth.currentDeviceID.isEmpty ? "待首次请求注册" : auth.currentDeviceID) : deviceID)")
                 .monospacedDigit()
             Text("Passport：security.snssdk.com · 业务：api5-normal-sinfonlinea.fqnovel.com")
