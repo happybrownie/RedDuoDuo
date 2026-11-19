@@ -55,6 +55,7 @@
 		ED021DF80FB6628ABB3D978D /* PlayerSubViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CFA109CF474ACB6F0031B04 /* PlayerSubViews.swift */; };
 		F0C8BCE8AAB2A5133452C18E /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = F535ADA4F7FCE8D3AAC426FD /* Theme.swift */; };
 		FB6743F6CCD0FD219A71E15D /* CachedAsyncImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1313659E6A96D21F1131FD2F /* CachedAsyncImage.swift */; };
+		FFDFDF96150C5257EE81F62C /* AlbumTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AB591E467D32BCC8FDF4EB /* AlbumTheme.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -116,6 +117,7 @@
 		ED1331A34D6CA130D94D6C9F /* ByteUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ByteUtils.swift; sourceTree = "<group>"; };
 		EFF0A076CDC51C211FBE895C /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		F1138449F1707C21C6698CDC /* ManjuAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManjuAPI.swift; sourceTree = "<group>"; };
+		F1AB591E467D32BCC8FDF4EB /* AlbumTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumTheme.swift; sourceTree = "<group>"; };
 		F285518362DC5AD4034982A1 /* OfflineCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfflineCacheManager.swift; sourceTree = "<group>"; };
 		F535ADA4F7FCE8D3AAC426FD /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		F8F2DCD4445794E19FA1F9D5 /* DouDuo-MIT.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "DouDuo-MIT.txt"; sourceTree = "<group>"; };
@@ -147,6 +149,7 @@
 		1D24E8822302690909039841 /* Theme */ = {
 			isa = PBXGroup;
 			children = (
+				F1AB591E467D32BCC8FDF4EB /* AlbumTheme.swift */,
 				E1001C82C10D067EFF2060BA /* AppearanceMode.swift */,
 				1313659E6A96D21F1131FD2F /* CachedAsyncImage.swift */,
 				F535ADA4F7FCE8D3AAC426FD /* Theme.swift */,
@@ -375,6 +378,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				192DF73204368B1A8B9DDD5B /* AVPlayerBridge.swift in Sources */,
+				FFDFDF96150C5257EE81F62C /* AlbumTheme.swift in Sources */,
 				11F5A88C22D41EDC4B438D86 /* AppLog.swift in Sources */,
 				755378ECCD18D1DBD4549632 /* AppearanceMode.swift in Sources */,
 				DA86EF8CC679A919F4A14B1B /* AuthStore.swift in Sources */,
@@ -551,7 +555,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.4.7;
+				MARKETING_VERSION = 1.4.8;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -616,7 +620,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.4.7;
+				MARKETING_VERSION = 1.4.8;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;

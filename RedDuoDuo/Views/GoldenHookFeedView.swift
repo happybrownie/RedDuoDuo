@@ -67,7 +67,9 @@ struct GoldenHookFeedView: View {
                 let w = max(1, geo.size.width)
                 let h = max(1, geo.size.height)
                 let topPad = max(safeInsets.top + 8, 16)
-                let bottomPad = max(safeInsets.bottom + 14, 24)
+                // 1.4.8 悬浮导航丸：作为 tab 时常驻 58 高 + 距底 12，试看流控件整体上移让位。
+                let navClearance: CGFloat = onClose == nil ? RDAlbum.Nav.height + RDAlbum.Nav.bottomGap : 0
+                let bottomPad = max(safeInsets.bottom + 14, 24) + navClearance
                 let leadingPad = max(safeInsets.leading, 16)
                 let trailingPad = max(safeInsets.trailing, 16)
 

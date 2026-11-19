@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 extension Notification.Name {
     static let rdScrollToTop = Notification.Name("redduoduo.scrollToTop")
@@ -25,18 +26,11 @@ struct RedDuoDuoApp: App {
     }
 }
 
+/// 1.4.8 悬浮导航丸：替换实体 TabBar，五项常驻、状态保留（ZStack 叠放不销毁页面）。
 struct RootTabView: View {
     @State private var selection = 0
-    init() {
-        // 自适应明暗半透明磨砂底栏、选中项品牌红
-        let ap = UITabBarAppearance()
-        ap.configureWithDefaultBackground()
-        ap.backgroundEffect = UIBlurEffect(style: .systemChromeMaterial)
-        ap.backgroundColor = RD.Palette.tabBarBackgroundUI
-        ap.shadowColor = RD.Palette.hairlineUI
-        UITabBar.appearance().standardAppearance = ap
-        UITabBar.appearance().scrollEdgeAppearance = ap
-    }
+    @ObservedObject private var chrome = RDAlbumChrome.shared
+    @Environment(\.colorScheme) private var colorScheme
 
     private var tabSelection: Binding<Int> {
         Binding(
@@ -47,40 +41,64 @@ struct RootTabView: View {
                     NotificationCenter.default.post(name: .rdScrollToTop, object: next)
                 } else {
                     RDHaptics.shared.playTabSwitch(sameTabTop: false)
-                    selection = next
+                    withAnimation(RDAlbum.Motion.rearrange) { selection = next }
                 }
             }
         )
     }
 
     var body: some View {
-        TabView(selection: tabSelection) {
-            HomeView(onOpenGoldenHooks: {
-                if selection != 1 {
-                    RDHaptics.shared.playTabSwitch(sameTabTop: false)
-                    selection = 1
+        ZStack(alignment: .bottom) {
+            RDAlbum.C.base.ignoresSafeArea()
+
+            ZStack {
+                HomeView(onOpenGoldenHooks: {
+                    tabSelection.wrappedValue = 1
+                })
+                .opacity(selection == 0 ? 1 : 0)
+                .allowsHitTesting(selection == 0)
+                .accessibilityHidden(selection != 0)
+
+                GoldenHookFeedView(isActive: selection == 1)
+                    .opacity(selection == 1 ? 1 : 0)
+                    .allowsHitTesting(selection == 1)
+                    .accessibilityHidden(selection != 1)
+
+                SearchView()
+                    .opacity(selection == 2 ? 1 : 0)
+                    .allowsHitTesting(selection == 2)
+                    .accessibilityHidden(selection != 2)
+
+                HistoryView()
+                    .opacity(selection == 3 ? 1 : 0)
+                    .allowsHitTesting(selection == 3)
+                    .accessibilityHidden(selection != 3)
+
+                ProfileView()
+                    .opacity(selection == 4 ? 1 : 0)
+                    .allowsHitTesting(selection == 4)
+                    .accessibilityHidden(selection != 4)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+            if !chrome.hidesBrowseChrome {
+                RDAlbumFloatingNav(selection: selectionBinding) { idx in
+                    tabSelection.wrappedValue = idx
                 }
-            })
-            .tabItem { Label("首页", systemImage: "house.fill") }
-            .tag(0)
-
-            GoldenHookFeedView(isActive: selection == 1)
-                .tabItem { Label("试看", systemImage: "flame.fill") }
-                .tag(1)
-
-            SearchView()
-                .tabItem { Label("搜索", systemImage: "magnifyingglass") }
-                .tag(2)
-
-            HistoryView()
-                .tabItem { Label("观看", systemImage: "clock.arrow.circlepath") }
-                .tag(3)
-
-            ProfileView()
-                .tabItem { Label("我的", systemImage: "person.fill") }
-                .tag(4)
+                // 试看流是恒深色媒体舞台，悬浮丸随舞台取深色玻璃。
+                .environment(\.colorScheme, selection == 1 ? .dark : colorScheme)
+                .transition(.opacity.combined(with: .move(edge: .bottom)))
+            }
         }
-        .tint(RD.Palette.accent)
+        .ignoresSafeArea(.keyboard, edges: .bottom)
+        .onChange(of: selection) { _, newValue in
+            if newValue != 2 {
+                chrome.setBrowseChromeHidden(false, reason: "searchTyping")
+                UIApplication.shared.sendAction(
+                    #selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil
+                )
+            }
+        }
         .background {
             GeometryReader { geo in
                 let wide = RD.isWide(geo.size.width)
@@ -92,6 +110,22 @@ struct RootTabView: View {
             }
             .allowsHitTesting(false)
         }
-        .background(RD.Palette.background.ignoresSafeArea())
+        .animation(RDAlbum.Motion.rearrange, value: selection)
+        .animation(RDAlbum.Motion.rearrange, value: chrome.hidesBrowseChrome)
+    }
+
+    private var selectionBinding: Binding<Int> {
+        Binding(
+            get: { selection },
+            set: { next in
+                guard next != selection else {
+                    RDHaptics.shared.playTabSwitch(sameTabTop: true)
+                    NotificationCenter.default.post(name: .rdScrollToTop, object: next)
+                    return
+                }
+                RDHaptics.shared.playTabSwitch(sameTabTop: false)
+                withAnimation(RDAlbum.Motion.rearrange) { selection = next }
+            }
+        )
     }
 }

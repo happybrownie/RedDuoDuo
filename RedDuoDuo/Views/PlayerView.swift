@@ -82,6 +82,8 @@ struct PlayerView: View {
     @State private var showRatePicker = false
     @State private var isAudioMode = false
     @State private var manualWorkbench = false
+    /// 1.4.8 大屏：左画 64% + 右浮板 36%（可收起成全屏画）。
+    @State private var wideBoardCollapsed = false
 
     @State private var firedAutoNextCountdownBeats: Set<Int> = []
     @State private var showFinaleOverlay = false
@@ -130,7 +132,18 @@ struct PlayerView: View {
                 let fullW = fullGeo.size.width
                 let fullH = fullGeo.size.height
                 let panes = DuoFoldLayout.resolvePanes(in: fullGeo, manualWorkbench: manualWorkbench)
-                let videoRect = panes?.videoRect ?? CGRect(origin: .zero, size: fullGeo.size)
+                // 1.4.8 大屏常驻右浮板：画面左 64% + 板右 36%（距 16）；物理半折/手动追剧台优先。
+                let wideBoard = panes == nil && RD.isWide(fullW) && !isAudioMode && !wideBoardCollapsed
+                let splitGap: CGFloat = 16
+                let splitVideoWidth = floor(fullW * 0.64)
+                let wideVideoRect = CGRect(x: 0, y: 0, width: max(1, splitVideoWidth), height: fullH)
+                let widePanelRect = CGRect(
+                    x: splitVideoWidth + splitGap,
+                    y: 16,
+                    width: max(1, fullW - splitVideoWidth - splitGap - 16),
+                    height: max(1, fullH - 32)
+                )
+                let videoRect = panes?.videoRect ?? (wideBoard ? wideVideoRect : CGRect(origin: .zero, size: fullGeo.size))
                 let w = max(1, videoRect.width)
                 let h = max(1, videoRect.height)
                 let isCompact = !RD.isWide(w)
@@ -207,26 +220,31 @@ struct PlayerView: View {
 
                         // 悬浮顶栏与底栏
                         VStack(spacing: 0) {
-                            floatingTopBar(compact: isCompact, isPhysicalFold: panes?.isPhysicalFold == true)
-                                .padding(.top, topPad)
-                                .padding(.leading, leadingPad)
-                                .padding(.trailing, trailingPad)
-                                .opacity((showControls || isAudioMode) ? 1 : 0)
-                                .allowsHitTesting(showControls || isAudioMode)
-                                .disabled(!(showControls || isAudioMode))
+                            floatingTopBar(
+                                compact: isCompact,
+                                isPhysicalFold: panes?.isPhysicalFold == true,
+                                wideLayout: RD.isWide(fullW) && panes == nil
+                            )
+                            .padding(.top, topPad)
+                            .padding(.leading, leadingPad)
+                            .padding(.trailing, trailingPad)
+                            .opacity((showControls || isAudioMode) ? 1 : 0)
+                            .allowsHitTesting(showControls || isAudioMode)
+                            .disabled(!(showControls || isAudioMode))
 
                             Spacer(minLength: 0)
 
-                            if !isAudioMode {
+                            // 半折追剧台：上屏纯画，播控全部收进下方追剧台大丸。
+                            if !isAudioMode && panes == nil {
                                 VStack(spacing: 10) {
                                     if showRatePicker && showControls && !loading {
                                         rateSelectorBar
                                             .transition(.opacity.combined(with: .move(edge: .bottom)))
                                     }
 
-                                    floatingBottomBar(compact: isCompact)
+                                    floatingBottomBar(compact: isCompact, showsDrawer: !wideBoard, wideBoard: wideBoard)
                                 }
-                                .padding(.bottom, bottomPad)
+                                .padding(.bottom, max(bottomPad, 16))
                                 .padding(.leading, leadingPad)
                                 .padding(.trailing, trailingPad)
                                 .opacity(showControls && !loading ? 1 : 0)
@@ -240,7 +258,7 @@ struct PlayerView: View {
                         // A7: 一键跳过片头 / 片尾悬浮按钮（在片头/片尾窗口内浮现）
                         if !loading && error == nil && !isAudioMode && !showEpisodeDrawer && !showFinaleOverlay {
                             skipIntroOutroPillOverlay(
-                                bottomPad: showControls ? bottomPad + (isCompact ? 186 : 136) : bottomPad + 28,
+                                bottomPad: showControls ? max(bottomPad, 16) + 84 : bottomPad + 28,
                                 trailingPad: trailingPad
                             )
                         }
@@ -320,7 +338,7 @@ struct PlayerView: View {
                                     .transition(.opacity.combined(with: .move(edge: .bottom)))
                             }
                         }
-                        .padding(.bottom, showControls && !loading ? bottomPad + (isCompact ? 180 : 128) + (showRatePicker ? 46 : 0) : bottomPad + 24)
+                        .padding(.bottom, showControls && !loading ? max(bottomPad, 16) + 76 + (showRatePicker ? 46 : 0) : bottomPad + 24)
                         .padding(.horizontal, max(leadingPad, trailingPad))
                         .allowsHitTesting(false)
                         .animation(RD.Motion.snappy, value: modeToast)
@@ -377,7 +395,58 @@ struct PlayerView: View {
                         )
                         .frame(width: panes.panelRect.width, height: panes.panelRect.height)
                         .position(x: panes.panelRect.midX, y: panes.panelRect.midY)
+                        .clipShape(RoundedRectangle(cornerRadius: RDAlbum.Radius.board, style: .continuous))
                         .transition(.opacity)
+                    }
+
+                    // 3. 1.4.8 大屏：右 36% 常驻玻璃浮板（选集 / 倍速 / 离线 / 接档）。
+                    if wideBoard {
+                        DuoBingeWorkbench(
+                            series: activeSeries,
+                            episodes: activeEpisodes,
+                            currentIndex: index,
+                            isBookPosture: false,
+                            isPhysicalFold: false,
+                            isPlaying: controller.isPlaying,
+                            currentTime: controller.time,
+                            duration: controller.duration,
+                            currentRate: currentSeriesRate,
+                            isAudioMode: isAudioMode,
+                            isPiPPossible: controller.isPiPPossible,
+                            onPlayPause: { togglePlayPause() },
+                            onPrev: {
+                                RDHaptics.shared.playGlassTap(disabled: index <= 0)
+                                go(-1)
+                            },
+                            onNext: {
+                                RDHaptics.shared.playGlassTap(disabled: index >= activeEpisodes.count - 1)
+                                go(1)
+                            },
+                            onSeek: { sec in seekAndPersist(sec, forceReport: false) },
+                            onSelectEpisode: { targetIdx in
+                                jumpToEpisode(targetIdx)
+                            },
+                            onSelectRate: { rate in
+                                selectSeriesRate(rate)
+                            },
+                            onSkipIntro: { performSkipIntro(manual: true) },
+                            onSkipOutro: { performSkipOutro(manual: true) },
+                            onToggleAudioMode: { toggleAudioMode() },
+                            onTogglePiP: { togglePictureInPicture() },
+                            onCacheNext10: {
+                                OfflineCacheManager.shared.cacheNext10(series: activeSeries, episodes: activeEpisodes, fromIndex: index)
+                                showToast("已加入离线缓存：后续 10 集")
+                            },
+                            onExitWorkbench: {
+                                RDHaptics.shared.playDrawerToggle(open: false)
+                                withAnimation(RDAlbum.Motion.drawer) { wideBoardCollapsed = true }
+                            }
+                        )
+                        .frame(width: widePanelRect.width, height: widePanelRect.height)
+                        .position(x: widePanelRect.midX, y: widePanelRect.midY)
+                        .clipShape(RoundedRectangle(cornerRadius: RDAlbum.Radius.board, style: .continuous))
+                        .shadow(color: Color.black.opacity(0.35), radius: 28, x: 0, y: 12)
+                        .transition(.opacity.combined(with: .move(edge: .trailing)))
                     }
                 }
                 .frame(width: fullW, height: fullH)
@@ -603,7 +672,7 @@ struct PlayerView: View {
 
     // MARK: - 悬浮顶栏 & 底栏
 
-    private func floatingTopBar(compact: Bool, isPhysicalFold: Bool) -> some View {
+    private func floatingTopBar(compact: Bool, isPhysicalFold: Bool, wideLayout: Bool = false) -> some View {
         let iconSize: CGFloat = compact ? 32 : 34
         return HStack(alignment: .center, spacing: compact ? 6 : 10) {
             Button {
@@ -676,123 +745,180 @@ struct PlayerView: View {
                 .accessibilityLabel("画中画小窗")
             }
 
-            // A2: 手动双屏追剧台切换（物理半折时自动开启）
+            // A2 / 1.4.8：大屏收起右板 / 手动追剧台（物理半折时自动开启）
             if !isPhysicalFold {
                 Button {
-                    RDHaptics.shared.playDrawerToggle(open: !manualWorkbench)
-                    withAnimation(RD.Motion.snappy) { manualWorkbench.toggle() }
+                    if wideLayout {
+                        RDHaptics.shared.playDrawerToggle(open: wideBoardCollapsed)
+                        withAnimation(RDAlbum.Motion.drawer) { wideBoardCollapsed.toggle() }
+                    } else {
+                        RDHaptics.shared.playDrawerToggle(open: !manualWorkbench)
+                        withAnimation(RD.Motion.snappy) { manualWorkbench.toggle() }
+                    }
                     pokeControls()
                 } label: {
-                    Image(systemName: manualWorkbench ? "rectangle.split.2x1.fill" : "rectangle.split.2x1")
+                    Image(systemName: wideLayout
+                          ? "sidebar.right"
+                          : (manualWorkbench ? "rectangle.split.2x1.fill" : "rectangle.split.2x1"))
                         .font(.system(size: compact ? 13 : 14, weight: .semibold))
-                        .foregroundStyle(manualWorkbench ? RD.Palette.gemRim : .white)
+                        .foregroundStyle(
+                            (wideLayout ? !wideBoardCollapsed : manualWorkbench) ? RD.Palette.gemRim : .white
+                        )
                         .frame(width: iconSize, height: iconSize)
                         .rdGlassCircle()
                 }
-                .accessibilityLabel("追剧台")
+                .accessibilityLabel(wideLayout ? (wideBoardCollapsed ? "展开右侧板" : "收起右侧板") : "追剧台")
             }
 
             stateBadge(dotOnly: compact)
         }
     }
 
-    private func floatingBottomBar(compact: Bool) -> some View {
-        VStack(spacing: compact ? 8 : 12) {
-            progressSliderSection
-
-            if compact {
-                compactBottomControls
-            } else {
-                wideBottomControls
+    /// 1.4.8 底部单药丸：高 56 / 距底 16 / 内 10；上集·播停·下集·进度·时间·全屏/展。
+    /// 只改视觉容器与布局，所有闭包仍调用原播放/拖拽/切集逻辑。
+    private func floatingBottomBar(compact: Bool, showsDrawer: Bool, wideBoard: Bool) -> some View {
+        let maxDur = max(controller.duration, 1)
+        return HStack(spacing: compact ? 8 : 10) {
+            pillTransportButton(
+                icon: "backward.end.fill",
+                size: 32,
+                disabled: index <= 0
+            ) {
+                RDHaptics.shared.playGlassTap(disabled: index <= 0)
+                go(-1)
             }
-        }
-    }
+            .accessibilityIdentifier("player-prev")
 
-    private var progressSliderSection: some View {
-        VStack(spacing: 4) {
-            let maxDur = max(controller.duration, 1)
-            Slider(
-                value: Binding(
-                    get: { min(max(controller.time, 0), maxDur) },
-                    set: { newVal in
+            pillPlayPauseButton
+
+            pillTransportButton(
+                icon: "forward.end.fill",
+                size: 32,
+                disabled: index >= activeEpisodes.count - 1
+            ) {
+                RDHaptics.shared.playGlassTap(disabled: index >= activeEpisodes.count - 1)
+                go(1)
+            }
+            .accessibilityIdentifier("player-next")
+
+            VStack(spacing: 1) {
+                RDAlbumScrubber(
+                    time: controller.time,
+                    duration: maxDur,
+                    onEditingChanged: { editing in
+                        isDraggingSlider = editing
+                        if editing {
+                            lastSliderValue = controller.time
+                            lastSliderUpdateTime = CACurrentMediaTime()
+                            didHitSliderEdge = false
+                            RDHaptics.shared.playSliderGrab()
+                        } else {
+                            RDHaptics.shared.playSliderRelease()
+                            persistProgress(force: true)
+                        }
+                    },
+                    onSeek: { newVal in
                         handleSliderDragValueChanged(newVal, maxDuration: maxDur)
                         seekAndPersist(newVal, forceReport: false)
                     }
-                ),
-                in: 0...maxDur,
-                onEditingChanged: { editing in
-                    isDraggingSlider = editing
-                    if editing {
-                        lastSliderValue = controller.time
-                        lastSliderUpdateTime = CACurrentMediaTime()
-                        didHitSliderEdge = false
-                        RDHaptics.shared.playSliderGrab()
-                    } else {
-                        RDHaptics.shared.playSliderRelease()
-                        persistProgress(force: true)
+                )
+
+                HStack(spacing: 4) {
+                    Text(format(controller.time))
+                        .foregroundStyle(RDAlbum.C.mediaPrimary)
+                    Spacer(minLength: 2)
+                    if currentSeriesRate != 1.0 {
+                        Text(RDPlaybackPrefs.rateLabel(currentSeriesRate))
+                            .foregroundStyle(RD.Palette.gemRim)
+                        Spacer(minLength: 2)
+                    }
+                    Text(format(controller.duration))
+                        .foregroundStyle(RDAlbum.C.mediaSecondary)
+                }
+                .font(RDAlbum.Font.timecode.monospacedDigit())
+                .lineLimit(1)
+            }
+            .frame(maxWidth: .infinity)
+
+            Button {
+                applyFillMode(!fillScreen, showFeedback: true, fromPinch: false)
+                pokeControls()
+            } label: {
+                RDVideoFitGlyph(inward: fillScreen)
+                    .stroke(.white, style: StrokeStyle(lineWidth: 1.6, lineCap: .round, lineJoin: .round))
+                    .frame(width: 15, height: 15)
+                    .frame(width: 32, height: 32)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("player-fit-toggle")
+
+            if showsDrawer {
+                Button {
+                    openEpisodeDrawer()
+                } label: {
+                    Image(systemName: "list.bullet")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .frame(width: 32, height: 32)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("player-episode-drawer-button")
+                .accessibilityLabel("选集")
+            }
+        }
+        .padding(.horizontal, 10)
+        .frame(height: 56)
+        .frame(maxWidth: wideBoard ? 480 : .infinity)
+        .frame(maxWidth: .infinity, alignment: wideBoard ? .leading : .center)
+        .rdAlbumGlass(Capsule(style: .continuous), kind: .player, shadow: true, shadowRadius: 28, shadowY: 12)
+        .contentShape(Capsule(style: .continuous))
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 24)
+                .onEnded { value in
+                    guard showsDrawer else { return }
+                    if value.translation.height <= -24 {
+                        openEpisodeDrawer()
                     }
                 }
-            )
-            .tint(accent)
-            .accessibilityIdentifier("player-slider")
-            HStack {
-                Text(format(controller.time))
-                Spacer()
-                if currentSeriesRate != 1.0 {
-                    Text("\(RDPlaybackPrefs.rateLabel(currentSeriesRate))")
-                        .foregroundStyle(RD.Palette.gemRim)
-                }
-                Spacer()
-                Text(format(controller.duration))
-            }
-            .font(.caption2.monospacedDigit().weight(.medium))
-            .foregroundStyle(.white.opacity(0.78))
-            .rdMediaShadow()
-        }
+        )
+        .environment(\.colorScheme, .dark)
     }
 
-    /// 宽屏/展开/横屏：保持现行单排布局不动。
-    private var wideBottomControls: some View {
-        ZStack {
-            HStack(spacing: 8) {
-                if current != nil {
-                    episodeDrawerButton(expanded: false)
-                }
-
-                Spacer()
-
-                ratePickerButton(expanded: false)
-
-                fitModeButton(expanded: false)
-            }
-
-            HStack(spacing: 28) {
-                prevEpisodeButton(compact: false)
-                playPauseButton
-                nextEpisodeButton(compact: false)
-            }
-            .foregroundStyle(.white)
+    private func pillTransportButton(icon: String, size: CGFloat, disabled: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.system(size: size * 0.38, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(width: size, height: size)
+                .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
+        .disabled(disabled)
+        .opacity(disabled ? 0.38 : 1)
     }
 
-    /// 小屏/折叠/紧凑宽度：双排控件（第一排居中传输，第二排三胶囊功能区 >= 44pt 可点）。
-    private var compactBottomControls: some View {
-        VStack(spacing: 6) {
-            HStack(spacing: 40) {
-                prevEpisodeButton(compact: true)
-                playPauseButton
-                nextEpisodeButton(compact: true)
+    /// 播停 38 白圆（反色图标），与胶囊同处单丸；点击行为与双击一致。
+    private var pillPlayPauseButton: some View {
+        Button {
+            togglePlayPause()
+        } label: {
+            ZStack {
+                Circle()
+                    .fill(Color.white)
+                    .frame(width: 38, height: 38)
+                    .shadow(color: Color.black.opacity(0.30), radius: 8, y: 3)
+                Image(systemName: controller.isPlaying ? "pause.fill" : "play.fill")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(RDAlbum.C.inverse)
+                    .offset(x: controller.isPlaying ? 0 : 1)
             }
-            .foregroundStyle(.white)
-            .frame(maxWidth: .infinity)
-
-            HStack(spacing: 10) {
-                episodeDrawerButton(expanded: true)
-                ratePickerButton(expanded: true)
-                fitModeButton(expanded: true)
-            }
-            .frame(maxWidth: .infinity)
+            .frame(width: 44, height: 44)
+            .contentShape(Circle())
         }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("player-play-pause")
     }
 
     private func prevEpisodeButton(compact: Bool) -> some View {
@@ -1010,7 +1136,7 @@ struct PlayerView: View {
     private func episodeDrawerLayer(w: CGFloat, h: CGFloat, leadingPad: CGFloat, trailingPad: CGFloat, bottomPad: CGFloat) -> some View {
         let sideMode = w > h && w >= 520
         return ZStack(alignment: sideMode ? .trailing : .bottom) {
-            Color.black.opacity(0.45)
+            Color.black.opacity(0.18)
                 .ignoresSafeArea()
                 .onTapGesture { closeEpisodeDrawer() }
 
@@ -1018,10 +1144,23 @@ struct PlayerView: View {
                 series: activeSeries,
                 episodes: activeEpisodes,
                 currentIndex: index,
+                currentRate: currentSeriesRate,
                 isLandscapeOrWide: sideMode,
+                isAudioMode: isAudioMode,
+                isPiPPossible: controller.isPiPPossible,
                 onSelect: { targetIdx in
                     closeEpisodeDrawer()
                     jumpToEpisode(targetIdx)
+                },
+                onSelectRate: { rate in
+                    selectSeriesRate(rate)
+                },
+                onToggleAudioMode: {
+                    closeEpisodeDrawer()
+                    toggleAudioMode()
+                },
+                onTogglePiP: {
+                    togglePictureInPicture()
                 },
                 onCacheNext10: {
                     OfflineCacheManager.shared.cacheNext10(series: activeSeries, episodes: activeEpisodes, fromIndex: index)
@@ -1034,12 +1173,20 @@ struct PlayerView: View {
                 onClose: { closeEpisodeDrawer() }
             )
             .frame(
-                width: sideMode ? min(w * 0.48, 370) : max(260, w - leadingPad - trailingPad),
-                height: sideMode ? max(240, h - 32) : min(h * 0.56, 440)
+                width: sideMode ? min(w * 0.44, 460) : min(max(260, w - 32), 460),
+                height: sideMode ? max(240, h - 32) : min(h * 0.52, 520)
             )
             .padding(.trailing, sideMode ? trailingPad : 0)
             .padding(.bottom, sideMode ? 16 : max(bottomPad, 16))
             .padding(.top, sideMode ? 16 : 0)
+            .simultaneousGesture(
+                DragGesture(minimumDistance: 24)
+                    .onEnded { value in
+                        if value.translation.height >= 40 {
+                            closeEpisodeDrawer()
+                        }
+                    }
+            )
         }
     }
 
@@ -1070,28 +1217,21 @@ struct PlayerView: View {
         .accessibilityIdentifier("player-fit-toggle")
     }
 
+    /// 仅状态点（禁外露 playing / buffering 等内部状态字符串）。
     private func stateBadge(dotOnly: Bool) -> some View {
         let isPlaying = controller.stateText == "playing"
         let isBuffering = controller.stateText == "buffering" || controller.stateText == "opening"
         let dotColor: Color = isPlaying
-            ? (dotOnly ? RD.Palette.gemBright : accent)
+            ? RD.Palette.gemBright
             : (isBuffering ? RD.Palette.warning : RD.Palette.textTertiary)
-        return HStack(spacing: 5) {
-            Circle()
-                .fill(dotColor)
-                .frame(width: dotOnly ? 8 : 6, height: dotOnly ? 8 : 6)
-                .shadow(color: (dotOnly && isPlaying) ? RD.Palette.gemBright.opacity(0.75) : .clear, radius: 3)
-            if !dotOnly {
-                Text(controller.stateText)
-            }
-        }
-        .accessibilityIdentifier("player-state")
-        .accessibilityLabel("播放状态：\(controller.stateText)")
-        .font(RD.Font.micro)
-        .foregroundStyle(.white)
-        .padding(.horizontal, dotOnly ? 9 : 10)
-        .padding(.vertical, dotOnly ? 8 : 6)
-        .rdGlassCircleCapsule()
+        return Circle()
+            .fill(dotColor)
+            .frame(width: 8, height: 8)
+            .shadow(color: isPlaying ? RD.Palette.gemBright.opacity(0.75) : .clear, radius: 3)
+            .padding(8)
+            .rdGlassCircleCapsule()
+            .accessibilityIdentifier("player-state")
+            .accessibilityLabel("播放状态")
     }
 
     private var loadingOverlay: some View {
@@ -1214,7 +1354,7 @@ struct PlayerView: View {
                 .frame(width: 6, height: 6)
                 .shadow(color: RD.Palette.gemBright, radius: 3)
             Text("2.0x »")
-                .font(.caption.monospacedDigit().weight(.heavy))
+                .font(.caption.monospacedDigit().weight(.bold))
                 .foregroundStyle(.white)
         }
         .padding(.horizontal, 14)
@@ -1414,13 +1554,13 @@ struct PlayerView: View {
         }
     }
 
-    /// 沉浸式：播放中控件 4 秒无操作自动淡出（自动隐藏绝不震动）。
+    /// 沉浸式：播放中控件 3 秒无操作自动淡出（自动隐藏绝不震动，不打断沉浸观看）。
     private func scheduleAutoHide() {
         hideTask?.cancel()
         guard showControls, controller.isPlaying, !loading, error == nil,
               !showEpisodeDrawer, !showRatePicker, !isAudioMode, !showFinaleOverlay else { return }
         hideTask = Task { @MainActor in
-            try? await Task.sleep(nanoseconds: 4_000_000_000)
+            try? await Task.sleep(nanoseconds: 3_000_000_000)
             if Task.isCancelled { return }
             withAnimation(RD.Motion.fade) { showControls = false }
         }
@@ -1435,7 +1575,7 @@ struct PlayerView: View {
 
     private func openEpisodeDrawer() {
         RDHaptics.shared.playDrawerToggle(open: true)
-        withAnimation(RD.Motion.snappy) {
+        withAnimation(RDAlbum.Motion.drawer) {
             showRatePicker = false
             showEpisodeDrawer = true
         }
@@ -1443,7 +1583,7 @@ struct PlayerView: View {
 
     private func closeEpisodeDrawer() {
         RDHaptics.shared.playDrawerToggle(open: false)
-        withAnimation(RD.Motion.snappy) {
+        withAnimation(RDAlbum.Motion.drawer) {
             showEpisodeDrawer = false
         }
     }
