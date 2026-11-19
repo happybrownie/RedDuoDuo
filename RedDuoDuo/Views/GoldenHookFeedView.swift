@@ -8,6 +8,7 @@ struct GoldenHookFeedView: View {
     var onClose: (() -> Void)? = nil
 
     @EnvironmentObject private var auth: AuthStore
+    @Environment(\.colorScheme) private var systemColorScheme
     @ObservedObject private var catalog = CatalogCache.shared
     @ObservedObject private var followStore = FollowStore.shared
 
@@ -421,6 +422,7 @@ struct GoldenHookFeedView: View {
             }
             .ignoresSafeArea(edges: onClose != nil ? .all : [.top, .horizontal])
         }
+        .environment(\.colorScheme, .dark)
         .task {
             if feed.isEmpty {
                 await bootstrapFeed(force: false)
@@ -458,6 +460,7 @@ struct GoldenHookFeedView: View {
             NavigationStack {
                 DetailView(initial: item)
             }
+            .environment(\.colorScheme, systemColorScheme)
         }
     }
 

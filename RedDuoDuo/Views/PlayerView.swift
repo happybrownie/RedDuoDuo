@@ -411,6 +411,7 @@ struct PlayerView: View {
                 .accessibilityIdentifier("player-time-sec")
         }
         .statusBarHidden(true)
+        .environment(\.colorScheme, .dark)
         .onAppear {
             controller.setBackgroundAudioEnabled(prefs.backgroundAudioEnabled)
             controller.setAudioOnlyMode(isAudioMode)

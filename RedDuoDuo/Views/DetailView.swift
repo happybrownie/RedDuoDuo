@@ -88,7 +88,6 @@ struct DetailView: View {
         .rdScreen()
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.hidden, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
         .onAppear {
             isCollected = FollowStore.shared.isCollected(series.id)
             offline.isOfflineUIVisible = true
@@ -132,7 +131,7 @@ struct DetailView: View {
                         HStack(spacing: 3) {
                             Image(systemName: "star.fill")
                                 .font(.system(size: 9))
-                                .foregroundStyle(RD.Palette.platinum)
+                                .foregroundStyle(RD.Palette.mediaSilver)
                             Text(series.score)
                         }
                         .font(RD.Font.micro)
@@ -146,9 +145,9 @@ struct DetailView: View {
                 Text(series.title.isEmpty ? initial.title : series.title)
                     .accessibilityIdentifier("detail-title")
                     .font(RD.Font.displayLarge)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(RD.Palette.textPrimary)
                     .lineLimit(3)
-                    .rdMediaShadow()
+                    .rdTitleShadow()
 
                 HStack(spacing: 6) {
                     Text("漫剧")
@@ -171,11 +170,11 @@ struct DetailView: View {
                             ForEach(series.tags, id: \.self) { tag in
                                 Text(tag)
                                     .font(RD.Font.micro)
-                                    .foregroundStyle(.white.opacity(0.85))
+                                    .foregroundStyle(RD.Palette.textPrimary.opacity(0.85))
                                     .padding(.horizontal, 8)
                                     .padding(.vertical, 3.5)
-                                    .background(Color.white.opacity(0.10), in: Capsule())
-                                    .overlay(Capsule().strokeBorder(RD.Palette.hairline, lineWidth: 0.5))
+                                    .background(RD.Palette.surfaceRaised.opacity(0.88), in: Capsule())
+                                    .overlay(Capsule().strokeBorder(RD.Palette.hairline, lineWidth: 0.6))
                             }
                         }
                     }
@@ -198,7 +197,7 @@ struct DetailView: View {
             if let collectBanner {
                 Text(collectBanner)
                     .font(.caption.bold())
-                    .foregroundStyle(RD.Palette.gemRim)
+                    .foregroundStyle(RD.Palette.gemAccentText)
             }
 
             if !episodes.isEmpty {
@@ -216,14 +215,14 @@ struct DetailView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "clock.fill")
                         .font(.caption2)
-                        .foregroundStyle(RD.Palette.gemRim)
+                        .foregroundStyle(RD.Palette.gemAccentText)
                     Text("上次看到第 \(entry.lastIndex) 集\(entry.lastPosition >= 1.5 ? " · \(entry.positionText)" : "")")
                         .font(RD.Font.caption.weight(.bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(RD.Palette.watchedCellText)
                 }
                 .padding(.horizontal, 11)
                 .padding(.vertical, 6)
-                .background(RD.Palette.gemVoid.opacity(0.90), in: Capsule())
+                .background(RD.Palette.watchedCellFill, in: Capsule())
                 .overlay(Capsule().strokeBorder(RD.Gem.anchorBorderGradient, lineWidth: 0.75))
                 .accessibilityIdentifier("detail-last-watched")
             }
@@ -278,10 +277,10 @@ struct DetailView: View {
         return VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 8) {
                 Image(systemName: "arrow.down.circle.fill")
-                    .foregroundStyle(RD.Palette.gemRim)
+                    .foregroundStyle(RD.Palette.gemAccentText)
                 Text("离线追剧包")
                     .font(RD.Font.headline)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(RD.Palette.textPrimary)
                 Spacer()
                 Text("已存 \(cachedCount)/\(episodes.count) 集")
                     .font(.caption.monospacedDigit())
@@ -295,7 +294,7 @@ struct DetailView: View {
                         .tint(RD.Palette.gemBright)
                     Text("正在下载：\(batchTitle)（\(offline.batchDoneCount)/\(offline.batchTotalCount)）")
                         .font(.caption2)
-                        .foregroundStyle(RD.Palette.gemRim)
+                        .foregroundStyle(RD.Palette.gemAccentText)
                         .lineLimit(1)
                     Spacer()
                     Button("暂停") {
@@ -455,15 +454,15 @@ struct DetailView: View {
                                 ZStack(alignment: .topTrailing) {
                                     Text("\(ep.index)")
                                         .font(RD.Font.headline.monospacedDigit())
-                                        .foregroundStyle(isCurrent ? .white : (watched ? Color.white.opacity(0.84) : .white))
+                                        .foregroundStyle(isCurrent ? .white : (watched ? RD.Palette.watchedCellText : RD.Palette.textPrimary))
                                         .frame(maxWidth: .infinity, minHeight: 44)
                                         .background {
                                             if isCurrent {
                                                 RDGemFacetSurface(shape: cellShape, shadowRadius: 5, borderWidth: 0.85)
                                             } else if watched {
                                                 cellShape
-                                                    .fill(RD.Palette.gemAbyss.opacity(0.62))
-                                                    .overlay(cellShape.strokeBorder(RD.Palette.gemCore.opacity(0.36), lineWidth: 0.7))
+                                                    .fill(RD.Palette.watchedCellFill)
+                                                    .overlay(cellShape.strokeBorder(RD.Palette.watchedCellBorder, lineWidth: 0.7))
                                             } else {
                                                 cellShape
                                                     .fill(RD.Palette.surfaceRaised)
@@ -474,12 +473,12 @@ struct DetailView: View {
                                     if cached {
                                         Image(systemName: "arrow.down.circle.fill")
                                             .font(.system(size: 9))
-                                            .foregroundStyle(RD.Palette.pearl)
+                                            .foregroundStyle(isCurrent ? RD.Palette.mediaPearl : RD.Palette.pearl)
                                             .padding(4)
                                     } else if state.isBusy {
                                         ProgressView()
                                             .controlSize(.mini)
-                                            .tint(RD.Palette.gemRim)
+                                            .tint(isCurrent ? .white : RD.Palette.gemAccentText)
                                             .scaleEffect(0.65)
                                             .padding(4)
                                     }

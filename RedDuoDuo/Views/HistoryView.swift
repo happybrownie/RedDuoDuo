@@ -117,8 +117,8 @@ struct HistoryView: View {
                 RDGemPlayMark(size: 22)
                 Text("观看记录")
                     .font(RD.Font.rowTitle)
-                    .foregroundStyle(.white)
-                    .rdMediaShadow()
+                    .foregroundStyle(RD.Palette.textPrimary)
+                    .rdTitleShadow()
             }
             .opacity(scrolled ? 1 : 0)
 
@@ -154,8 +154,8 @@ struct HistoryView: View {
             }
             Text("观看记录")
                 .font(RD.Font.displayLarge)
-                .foregroundStyle(.white)
-                .rdMediaShadow()
+                .foregroundStyle(RD.Palette.textPrimary)
+                .rdTitleShadow()
                 .accessibilityAddTraits(.isHeader)
             Text("自动保存集数与秒级进度，点开即可接着看")
                 .font(RD.Font.body)
@@ -203,7 +203,7 @@ struct HistoryView: View {
 
                         Text(entry.title)
                             .font(RD.Font.title)
-                            .foregroundStyle(.white)
+                            .foregroundStyle(RD.Palette.textPrimary)
                             .lineLimit(2)
                             .multilineTextAlignment(.leading)
 
@@ -215,7 +215,7 @@ struct HistoryView: View {
                         if entry.progressFraction > 0 {
                             GeometryReader { g in
                                 ZStack(alignment: .leading) {
-                                    Capsule().fill(Color.white.opacity(0.14))
+                                    Capsule().fill(RD.Palette.hairline)
                                     Capsule()
                                         .fill(RD.Gem.progressGradient)
                                         .frame(width: max(6, g.size.width * entry.progressFraction))
@@ -295,7 +295,7 @@ struct HistoryView: View {
                     VStack(alignment: .leading, spacing: 6) {
                         Text(entry.title)
                             .font(RD.Font.headline)
-                            .foregroundStyle(.white)
+                            .foregroundStyle(RD.Palette.textPrimary)
                             .lineLimit(2)
                             .multilineTextAlignment(.leading)
 

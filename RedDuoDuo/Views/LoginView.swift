@@ -29,7 +29,7 @@ struct LoginView: View {
             ZStack {
                 RD.Palette.background.ignoresSafeArea()
                 RadialGradient(
-                    colors: [RD.Palette.gemDeep.opacity(0.28), .clear],
+                    colors: [RD.Palette.ambientTopGlowStrong, .clear],
                     center: .topLeading,
                     startRadius: 20,
                     endRadius: 340
@@ -54,14 +54,13 @@ struct LoginView: View {
             .navigationTitle(mfaContext == nil ? "登录红果账号" : "短信安全验证")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(RD.Palette.background, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("关闭") {
                         mfaPollTask?.cancel()
                         dismiss()
                     }
-                    .foregroundStyle(.white.opacity(0.8))
+                    .foregroundStyle(RD.Palette.textPrimary.opacity(0.85))
                 }
             }
             .onReceive(timer) { _ in
@@ -79,11 +78,11 @@ struct LoginView: View {
                 RDGemPlayMark(size: 30)
                 Text("红果漫剧")
                     .font(.system(size: 28, weight: .black))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(RD.Palette.textPrimary)
             }
             Text("红果账号短信登录")
                 .font(RD.Font.display)
-                .foregroundStyle(.white)
+                .foregroundStyle(RD.Palette.textPrimary)
             Text("账号凭据仅保存在本机，绑定当前设备身份")
                 .font(RD.Font.body)
                 .foregroundStyle(RD.Palette.textSecondary)
@@ -96,12 +95,12 @@ struct LoginView: View {
         VStack(alignment: .leading, spacing: 14) {
             Text("手机号（中国大陆 +86）")
                 .font(.caption.weight(.medium))
-                .foregroundStyle(.white.opacity(0.7))
+                .foregroundStyle(RD.Palette.textSecondary)
 
             HStack(spacing: 10) {
                 Text("+86")
                     .font(.subheadline.monospacedDigit().bold())
-                    .foregroundStyle(.white.opacity(0.8))
+                    .foregroundStyle(RD.Palette.textPrimary.opacity(0.85))
                     .padding(.horizontal, 10)
                     .padding(.vertical, 8)
                     .background(RD.Palette.background, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
@@ -109,7 +108,7 @@ struct LoginView: View {
                 TextField("请输入 11 位手机号", text: $mobile)
                     .keyboardType(.numberPad)
                     .textContentType(.telephoneNumber)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(RD.Palette.textPrimary)
                     .accessibilityIdentifier("login-mobile-field")
             }
             .padding(12)
@@ -117,20 +116,20 @@ struct LoginView: View {
 
             Text("短信验证码")
                 .font(.caption.weight(.medium))
-                .foregroundStyle(.white.opacity(0.7))
+                .foregroundStyle(RD.Palette.textSecondary)
 
             HStack(spacing: 10) {
                 TextField("请输入验证码", text: $code)
                     .keyboardType(.numberPad)
                     .textContentType(.oneTimeCode)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(RD.Palette.textPrimary)
                     .accessibilityIdentifier("login-code-field")
 
                 Button {
                     Task { await sendCode() }
                 } label: {
                     if sendingCode {
-                        ProgressView().controlSize(.small).tint(.white)
+                        ProgressView().controlSize(.small).tint(RD.Palette.textSecondary)
                             .frame(minWidth: 88)
                     } else {
                         Text(countdown > 0 ? "\(countdown)s 后重发" : "获取验证码")
@@ -162,7 +161,7 @@ struct LoginView: View {
                 HStack {
                     Spacer()
                     if loggingIn {
-                        ProgressView().tint(.white)
+                        ProgressView().tint(RD.Palette.textSecondary)
                     } else {
                         Text("登录")
                             .font(.headline)
@@ -202,7 +201,7 @@ struct LoginView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("需要发送上行短信完成验证")
                         .font(.headline)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(RD.Palette.textPrimary)
                     Text("新设备登录保护（错误码 2046）")
                         .font(.caption)
                         .foregroundStyle(RD.Palette.warning)
@@ -211,7 +210,7 @@ struct LoginView: View {
 
             Text("由于当前使用新设备登录，请使用本机号码发送一条普通验证短信以确认本人操作：")
                 .font(.subheadline)
-                .foregroundStyle(.white.opacity(0.82))
+                .foregroundStyle(RD.Palette.textSecondary)
 
             VStack(alignment: .leading, spacing: 12) {
                 stepRow(num: "1", text: "使用本机号码（\(ManjuAPI.normalizeMobile(mobile))）打开手机「信息」App")
@@ -222,10 +221,10 @@ struct LoginView: View {
                         VStack(alignment: .leading, spacing: 2) {
                             Text("接收号码")
                                 .font(.caption2)
-                                .foregroundStyle(.white.opacity(0.55))
+                                .foregroundStyle(RD.Palette.textTertiary)
                             Text(targetNumber)
                                 .font(.title3.monospacedDigit().bold())
-                                .foregroundStyle(.white)
+                                .foregroundStyle(RD.Palette.textPrimary)
                         }
                         Spacer()
                         Button("复制号码") {
@@ -236,16 +235,16 @@ struct LoginView: View {
                         .buttonStyle(RDGemSecondaryButtonStyle(capsule: true, horizontalPadding: 10, verticalPadding: 6))
                     }
 
-                    Divider().background(Color.white.opacity(0.12))
+                    Divider().background(RD.Palette.hairline)
 
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
                             Text("发送内容")
                                 .font(.caption2)
-                                .foregroundStyle(.white.opacity(0.55))
+                                .foregroundStyle(RD.Palette.textTertiary)
                             Text(smsBody)
                                 .font(.title3.monospaced().bold())
-                                .foregroundStyle(RD.Palette.gemRim)
+                                .foregroundStyle(RD.Palette.gemAccentText)
                         }
                         Spacer()
                         Button("复制内容") {
@@ -285,7 +284,7 @@ struct LoginView: View {
                         RoundedRectangle(cornerRadius: RD.Radius.control, style: .continuous)
                             .strokeBorder(RD.Gem.cardBorderGradient, lineWidth: 0.75)
                     )
-                    .foregroundStyle(.white)
+                    .foregroundStyle(RD.Palette.textPrimary)
             }
 
             Button {
@@ -316,7 +315,7 @@ struct LoginView: View {
 
             Text(mfaPollHint)
                 .font(.caption)
-                .foregroundStyle(.white.opacity(0.7))
+                .foregroundStyle(RD.Palette.textSecondary)
 
             HStack {
                 Button("返回重填验证码") {
@@ -326,7 +325,7 @@ struct LoginView: View {
                     statusMessage = nil
                 }
                 .font(.caption)
-                .foregroundStyle(.white.opacity(0.6))
+                .foregroundStyle(RD.Palette.textTertiary)
                 Spacer()
                 if pollingMfa {
                     Button("停止轮询") {
@@ -354,7 +353,7 @@ struct LoginView: View {
                 }
             Text(text)
                 .font(.footnote)
-                .foregroundStyle(.white.opacity(0.85))
+                .foregroundStyle(RD.Palette.textPrimary.opacity(0.88))
                 .fixedSize(horizontal: false, vertical: true)
         }
     }
@@ -366,7 +365,7 @@ struct LoginView: View {
                 .foregroundStyle(tone)
             Text(text)
                 .font(.footnote)
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(RD.Palette.textPrimary.opacity(0.92))
                 .textSelection(.enabled)
                 .accessibilityIdentifier("login-status-text")
             Spacer()
@@ -380,12 +379,12 @@ struct LoginView: View {
         VStack(alignment: .leading, spacing: 6) {
             Text("说明")
                 .font(.caption.bold())
-                .foregroundStyle(.white.opacity(0.55))
+                .foregroundStyle(RD.Palette.textSecondary)
             Text("• 游客状态下仍可正常浏览与播放；登录后可同步红果账号个性化推荐、云端观看记录与收藏。")
             Text("• 认证服务直连 security.snssdk.com，并使用本机固定设备身份完成签名。")
         }
         .font(.caption2)
-        .foregroundStyle(.white.opacity(0.45))
+        .foregroundStyle(RD.Palette.textTertiary)
         .padding(.horizontal, 4)
     }
 

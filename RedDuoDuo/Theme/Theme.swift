@@ -4,29 +4,88 @@
 // Modified for RedDuoDuo: Faceted Ruby design language, RD palette/typography/
 // components, glassEffect and iOS 27.1 reservedRegions layout hooks.
 import SwiftUI
+import UIKit
 
-// RedDuoDuo 1.4.2 统一主题：黑曜石暗色玻璃底（#141414）+ 珠宝切面深红宝石（Faceted Ruby）组件语言。
-// 质感唯一锚点 = AppIcon-1024.png：深红通透、斜角切面高光、克制内发光、边缘一线亮、阴影收敛；次要元素退回干净暗色玻璃。
+// RedDuoDuo 1.4.6 统一主题：明暗自适应系统外观（深色保持黑曜石暗色玻璃底 #121214，浅色呈干净白/浅灰底）+ 珠宝切面深红宝石（Faceted Ruby）组件语言。
+// 质感唯一锚点 = AppIcon-1024.png：深红通透、斜角切面高光、克制内发光、边缘一线亮、阴影收敛；次要元素退回干净玻璃。
+
+private func rdAdaptiveColor(light: UIColor, dark: UIColor) -> Color {
+    Color(uiColor: rdAdaptiveUIColor(light: light, dark: dark))
+}
+
+private func rdAdaptiveUIColor(light: UIColor, dark: UIColor) -> UIColor {
+    UIColor { traits in
+        traits.userInterfaceStyle == .dark ? dark : light
+    }
+}
 
 enum RD {
     // MARK: 颜色
     enum Palette {
-        static let background = Color(red: 18/255, green: 18/255, blue: 20/255)       // #121214 黑曜石底
-        static let surface = Color(red: 27/255, green: 27/255, blue: 30/255)          // #1B1B1E 烟熏黑玻璃
-        static let surfaceRaised = Color(red: 36/255, green: 36/255, blue: 40/255)    // #242428
-        static let surfaceElevated = Color(red: 48/255, green: 48/255, blue: 53/255)  // #303035
+        static let backgroundUI = rdAdaptiveUIColor(
+            light: .systemBackground,
+            dark: UIColor(red: 18/255, green: 18/255, blue: 20/255, alpha: 1)
+        )
+        static let tabBarBackgroundUI = rdAdaptiveUIColor(
+            light: UIColor.systemBackground.withAlphaComponent(0.84),
+            dark: UIColor(red: 18/255, green: 18/255, blue: 20/255, alpha: 0.84)
+        )
+        static let hairlineUI = rdAdaptiveUIColor(
+            light: UIColor.black.withAlphaComponent(0.09),
+            dark: UIColor.white.withAlphaComponent(0.09)
+        )
+
+        static let background = Color(uiColor: backgroundUI)
+        static let surface = rdAdaptiveColor(
+            light: .secondarySystemBackground,
+            dark: UIColor(red: 27/255, green: 27/255, blue: 30/255, alpha: 1)
+        )
+        static let surfaceRaised = rdAdaptiveColor(
+            light: UIColor(red: 233/255, green: 233/255, blue: 238/255, alpha: 1),
+            dark: UIColor(red: 36/255, green: 36/255, blue: 40/255, alpha: 1)
+        )
+        static let surfaceElevated = rdAdaptiveColor(
+            light: UIColor(red: 222/255, green: 222/255, blue: 229/255, alpha: 1),
+            dark: UIColor(red: 48/255, green: 48/255, blue: 53/255, alpha: 1)
+        )
         static let accent = Color(red: 196/255, green: 12/255, blue: 24/255)          // #C40C18 深石榴主红
-        static let accentGlow = Color(red: 168/255, green: 10/255, blue: 22/255).opacity(0.24)
-        static let textPrimary = Color.white
-        static let textSecondary = Color(white: 0.74)
-        static let textTertiary = Color(white: 0.50)
-        static let hairline = Color.white.opacity(0.09)
-        static let highlight = Color.white.opacity(0.18)
-        static let warning = Color(red: 230/255, green: 152/255, blue: 72/255)        // 收敛琥珀警示
-        static let success = Color(red: 186/255, green: 214/255, blue: 202/255)       // 克制银翠状态点（禁高饱和艳绿）
-        static let platinum = Color(red: 220/255, green: 224/255, blue: 232/255)      // 珠宝铂银（替代刺眼黄，禁红金混搭）
-        static let pearl = Color(red: 204/255, green: 212/255, blue: 222/255)         // 冷月珍珠银（离线/完成徽标点）
+        static let accentGlow = rdAdaptiveColor(
+            light: UIColor(red: 196/255, green: 12/255, blue: 24/255, alpha: 0.14),
+            dark: UIColor(red: 168/255, green: 10/255, blue: 22/255, alpha: 0.24)
+        )
+        static let textPrimary = rdAdaptiveColor(light: .label, dark: .white)
+        static let textSecondary = rdAdaptiveColor(light: .secondaryLabel, dark: UIColor(white: 0.74, alpha: 1))
+        static let textTertiary = rdAdaptiveColor(
+            light: UIColor(red: 110/255, green: 110/255, blue: 115/255, alpha: 1),
+            dark: UIColor(white: 0.50, alpha: 1)
+        )
+        static let hairline = Color(uiColor: hairlineUI)
+        static let highlight = rdAdaptiveColor(
+            light: UIColor.black.withAlphaComponent(0.12),
+            dark: UIColor.white.withAlphaComponent(0.18)
+        )
+        static let warning = rdAdaptiveColor(
+            light: UIColor(red: 184/255, green: 92/255, blue: 10/255, alpha: 1),
+            dark: UIColor(red: 230/255, green: 152/255, blue: 72/255, alpha: 1)
+        )        // 收敛琥珀警示
+        static let success = rdAdaptiveColor(
+            light: UIColor(red: 28/255, green: 126/255, blue: 86/255, alpha: 1),
+            dark: UIColor(red: 186/255, green: 214/255, blue: 202/255, alpha: 1)
+        )       // 克制银翠状态点（禁高饱和艳绿）
+        static let platinum = rdAdaptiveColor(
+            light: UIColor(red: 86/255, green: 94/255, blue: 109/255, alpha: 1),
+            dark: UIColor(red: 220/255, green: 224/255, blue: 232/255, alpha: 1)
+        )      // 珠宝铂银（浅色收归冷灰银保证对比度）
+        static let pearl = rdAdaptiveColor(
+            light: UIColor(red: 66/255, green: 94/255, blue: 108/255, alpha: 1),
+            dark: UIColor(red: 204/255, green: 212/255, blue: 222/255, alpha: 1)
+        )         // 冷月珍珠银（离线/完成徽标点）
         static let gold = platinum                                                    // 兼容旧符号，全站收归铂银冷辉
+
+        // 压在海报/视频等深色媒体浮层上的固定亮银/辅字（与页面明暗无关）
+        static let mediaSilver = Color(red: 220/255, green: 224/255, blue: 232/255)
+        static let mediaPearl = Color(red: 204/255, green: 212/255, blue: 222/255)
+        static let mediaTextSecondary = Color(white: 0.78)
 
         // Faceted Ruby 宝石色阶（严格采样自 AppIcon-1024 深红宝石播放键）
         static let gemVoid = Color(red: 34/255, green: 2/255, blue: 6/255)            // #220206 最深暗影切面
@@ -37,10 +96,124 @@ enum RD {
         static let gemCaustic = Color(red: 255/255, green: 84/255, blue: 76/255)      // #FF544C 内部折射焦散光
         static let gemRim = Color(red: 255/255, green: 186/255, blue: 180/255)        // #FFBAB4 边缘折射亮丝
         static let gemFilament = Color(red: 255/255, green: 242/255, blue: 236/255)   // #FFF2EC 刀锋白粉亮边
-        static let gemText = Color(red: 238/255, green: 146/255, blue: 150/255)       // #EE9296 克制玫瑰银辅字
-        static let gemBorder = Color(red: 255/255, green: 138/255, blue: 132/255).opacity(0.36)
-        static let gemBorderSoft = Color(red: 196/255, green: 12/255, blue: 24/255).opacity(0.24)
-        static let gemGlow = Color(red: 168/255, green: 10/255, blue: 22/255).opacity(0.42)
+        static let gemText = rdAdaptiveColor(
+            light: UIColor(red: 168/255, green: 10/255, blue: 22/255, alpha: 1),
+            dark: UIColor(red: 238/255, green: 146/255, blue: 150/255, alpha: 1)
+        )       // #EE9296 / #A80A16 玫瑰宝石辅字
+        static let gemAccentText = rdAdaptiveColor(
+            light: UIColor(red: 184/255, green: 12/255, blue: 24/255, alpha: 1),
+            dark: UIColor(red: 255/255, green: 186/255, blue: 180/255, alpha: 1)
+        )       // 页面级强调红字/图标（暗色亮丝粉 / 浅色宝石红）
+        static let gemBorder = rdAdaptiveColor(
+            light: UIColor(red: 184/255, green: 12/255, blue: 24/255, alpha: 0.34),
+            dark: UIColor(red: 255/255, green: 138/255, blue: 132/255, alpha: 0.36)
+        )
+        static let gemBorderSoft = rdAdaptiveColor(
+            light: UIColor(red: 184/255, green: 12/255, blue: 24/255, alpha: 0.20),
+            dark: UIColor(red: 196/255, green: 12/255, blue: 24/255, alpha: 0.24)
+        )
+        static let gemGlow = rdAdaptiveColor(
+            light: UIColor(red: 168/255, green: 10/255, blue: 22/255, alpha: 0.20),
+            dark: UIColor(red: 168/255, green: 10/255, blue: 22/255, alpha: 0.42)
+        )
+
+        // 明暗玻璃边线、投影与状态底色
+        static let cardShadow = rdAdaptiveColor(
+            light: UIColor.black.withAlphaComponent(0.08),
+            dark: UIColor.black.withAlphaComponent(0.30)
+        )
+        static let posterShadow = rdAdaptiveColor(
+            light: UIColor.black.withAlphaComponent(0.16),
+            dark: UIColor.black.withAlphaComponent(0.50)
+        )
+        static let secondaryButtonShadow = rdAdaptiveColor(
+            light: UIColor.black.withAlphaComponent(0.12),
+            dark: UIColor.black.withAlphaComponent(0.42)
+        )
+        static let cardSheenTop = rdAdaptiveColor(
+            light: UIColor.white.withAlphaComponent(0.75),
+            dark: UIColor.white.withAlphaComponent(0.05)
+        )
+        static let cardBorderHighlight = rdAdaptiveColor(
+            light: UIColor.black.withAlphaComponent(0.11),
+            dark: UIColor.white.withAlphaComponent(0.14)
+        )
+        static let cardBorderMid = rdAdaptiveColor(
+            light: UIColor.black.withAlphaComponent(0.07),
+            dark: UIColor.white.withAlphaComponent(0.07)
+        )
+        static let posterBorderHighlight = rdAdaptiveColor(
+            light: UIColor.black.withAlphaComponent(0.14),
+            dark: UIColor.white.withAlphaComponent(0.24)
+        )
+        static let posterBorderMid = rdAdaptiveColor(
+            light: UIColor.black.withAlphaComponent(0.08),
+            dark: UIColor.white.withAlphaComponent(0.09)
+        )
+        static let posterBorderLow = rdAdaptiveColor(
+            light: UIColor.black.withAlphaComponent(0.05),
+            dark: UIColor.white.withAlphaComponent(0.05)
+        )
+        static let glassSecondaryFill = rdAdaptiveColor(
+            light: UIColor(red: 242/255, green: 242/255, blue: 247/255, alpha: 0.78),
+            dark: UIColor(red: 24/255, green: 24/255, blue: 28/255, alpha: 0.55)
+        )
+        static let watchedCellFill = rdAdaptiveColor(
+            light: UIColor(red: 168/255, green: 10/255, blue: 22/255, alpha: 0.10),
+            dark: UIColor(red: 64/255, green: 3/255, blue: 10/255, alpha: 0.62)
+        )
+        static let watchedCellBorder = rdAdaptiveColor(
+            light: UIColor(red: 168/255, green: 10/255, blue: 22/255, alpha: 0.34),
+            dark: UIColor(red: 168/255, green: 10/255, blue: 22/255, alpha: 0.36)
+        )
+        static let watchedCellText = rdAdaptiveColor(
+            light: UIColor(red: 152/255, green: 8/255, blue: 20/255, alpha: 1),
+            dark: UIColor(white: 1.0, alpha: 0.84)
+        )
+        static let shimmerHighlight = rdAdaptiveColor(
+            light: UIColor.white.withAlphaComponent(0.65),
+            dark: UIColor.white.withAlphaComponent(0.12)
+        )
+        static let anchorCardGlowTop = rdAdaptiveColor(
+            light: UIColor(red: 168/255, green: 10/255, blue: 22/255, alpha: 0.08),
+            dark: UIColor(red: 112/255, green: 6/255, blue: 16/255, alpha: 0.34)
+        )
+        static let anchorCardGlowMid = rdAdaptiveColor(
+            light: UIColor(red: 168/255, green: 10/255, blue: 22/255, alpha: 0.03),
+            dark: UIColor(red: 64/255, green: 3/255, blue: 10/255, alpha: 0.12)
+        )
+        static let anchorBorderStart = rdAdaptiveColor(
+            light: UIColor(red: 196/255, green: 12/255, blue: 24/255, alpha: 0.45),
+            dark: UIColor(red: 255/255, green: 242/255, blue: 236/255, alpha: 0.62)
+        )
+        static let anchorBorderMid = rdAdaptiveColor(
+            light: UIColor(red: 168/255, green: 10/255, blue: 22/255, alpha: 0.24),
+            dark: UIColor(red: 255/255, green: 186/255, blue: 180/255, alpha: 0.34)
+        )
+        static let ambientTopGlowStrong = rdAdaptiveColor(
+            light: UIColor(red: 196/255, green: 12/255, blue: 24/255, alpha: 0.07),
+            dark: UIColor(red: 112/255, green: 6/255, blue: 16/255, alpha: 0.24)
+        )
+        static let ambientTopGlowSoft = rdAdaptiveColor(
+            light: UIColor(red: 196/255, green: 12/255, blue: 24/255, alpha: 0.025),
+            dark: UIColor(red: 64/255, green: 3/255, blue: 10/255, alpha: 0.08)
+        )
+        static let topStatusScrimStrong = rdAdaptiveColor(
+            light: UIColor.white.withAlphaComponent(0.52),
+            dark: UIColor.black.withAlphaComponent(0.68)
+        )
+        static let topStatusScrimMid = rdAdaptiveColor(
+            light: UIColor.white.withAlphaComponent(0.16),
+            dark: UIColor.black.withAlphaComponent(0.22)
+        )
+        static let rankBevelShadow = rdAdaptiveColor(
+            light: UIColor.black.withAlphaComponent(0.28),
+            dark: UIColor.black.withAlphaComponent(0.92)
+        )
+        static let compactHeroWingMist = rdAdaptiveColor(
+            light: UIColor.white.withAlphaComponent(0.24),
+            dark: UIColor.black.withAlphaComponent(0.48)
+        )
     }
 
     // MARK: 宝石渐变与公共笔刷
@@ -81,12 +254,12 @@ enum RD {
             endPoint: .bottomTrailing
         )
 
-        /// 暗色玻璃海报框边缘（次要容器退回克制冷银玻璃棱边，零糊红框）。
+        /// 玻璃海报框边缘（深色冷银微棱，浅色收敛灰棱）。
         static let posterBorderGradient = LinearGradient(
             stops: [
-                .init(color: Color.white.opacity(0.24), location: 0.0),
-                .init(color: Color.white.opacity(0.09), location: 0.45),
-                .init(color: Color.white.opacity(0.05), location: 1.0)
+                .init(color: Palette.posterBorderHighlight, location: 0.0),
+                .init(color: Palette.posterBorderMid, location: 0.45),
+                .init(color: Palette.posterBorderLow, location: 1.0)
             ],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
@@ -95,8 +268,8 @@ enum RD {
         /// 主锚点宝石卡片边线（克制一线亮红宝石棱）。
         static let anchorBorderGradient = LinearGradient(
             stops: [
-                .init(color: Palette.gemFilament.opacity(0.62), location: 0.0),
-                .init(color: Palette.gemRim.opacity(0.34), location: 0.25),
+                .init(color: Palette.anchorBorderStart, location: 0.0),
+                .init(color: Palette.anchorBorderMid, location: 0.25),
                 .init(color: Palette.gemCore.opacity(0.20), location: 0.65),
                 .init(color: Palette.gemCaustic.opacity(0.28), location: 1.0)
             ],
@@ -104,11 +277,11 @@ enum RD {
             endPoint: .bottomTrailing
         )
 
-        /// 普通卡片干净暗色玻璃细描边。
+        /// 普通卡片干净玻璃细描边。
         static let cardBorderGradient = LinearGradient(
             colors: [
-                Color.white.opacity(0.14),
-                Color.white.opacity(0.07),
+                Palette.cardBorderHighlight,
+                Palette.cardBorderMid,
                 Palette.hairline
             ],
             startPoint: .topLeading,
@@ -266,18 +439,18 @@ struct RDScrim: View {
     }
 }
 
-/// Netflix 式 Hero 多层遮罩：顶部导航保护晕 + 宽屏左侧文字保护晕 + 多段式底部与背景融接。
+/// Netflix 式 Hero 多层遮罩：顶部状态栏保护晕 + 宽屏左侧文字保护晕 + 多段式底部与背景融接。
 struct RDHeroScrim: View {
     var wide: Bool = false
 
     var body: some View {
         ZStack {
-            // 1. 顶部暗化，保证顶栏图标与状态栏可读
+            // 1. 顶部保护渐变，保证状态栏与顶栏控件在明暗模式下均清晰可读
             VStack(spacing: 0) {
                 LinearGradient(
                     stops: [
-                        .init(color: .black.opacity(0.68), location: 0),
-                        .init(color: .black.opacity(0.22), location: 0.55),
+                        .init(color: RD.Palette.topStatusScrimStrong, location: 0),
+                        .init(color: RD.Palette.topStatusScrimMid, location: 0.55),
                         .init(color: .clear, location: 1)
                     ],
                     startPoint: .top,
@@ -287,7 +460,7 @@ struct RDHeroScrim: View {
                 Spacer(minLength: 0)
             }
 
-            // 2. 宽屏时左半侧径向/横向暗化，突出左排大标题
+            // 2. 宽屏时左半侧径向/横向柔化，突出左排大标题
             if wide {
                 LinearGradient(
                     stops: [
@@ -301,13 +474,14 @@ struct RDHeroScrim: View {
                 )
             }
 
-            // 3. 底部多段平滑渐隐融入 #141414 纯黑底，消除硬切缝
+            // 3. 底部多段平滑渐隐融入当前主题背景色，消除硬切缝
             LinearGradient(
                 stops: [
-                    .init(color: .clear, location: 0.18),
-                    .init(color: RD.Palette.background.opacity(0.24), location: 0.45),
-                    .init(color: RD.Palette.background.opacity(0.66), location: 0.70),
-                    .init(color: RD.Palette.background.opacity(0.94), location: 0.88),
+                    .init(color: .clear, location: 0.16),
+                    .init(color: RD.Palette.background.opacity(0.28), location: 0.40),
+                    .init(color: RD.Palette.background.opacity(0.72), location: 0.62),
+                    .init(color: RD.Palette.background.opacity(0.95), location: 0.78),
+                    .init(color: RD.Palette.background, location: 0.92),
                     .init(color: RD.Palette.background, location: 1.0)
                 ],
                 startPoint: .top,
@@ -453,8 +627,8 @@ struct RDGemFacetSurface<S: InsettableShape>: View {
             shape
                 .strokeBorder(RD.Gem.innerRimGradient, lineWidth: borderWidth)
         }
-        .shadow(color: RD.Palette.gemCore.opacity(pressed ? 0.25 : 0.40), radius: pressed ? 4 : shadowRadius, x: 0, y: pressed ? 1 : 2)
-        .shadow(color: .black.opacity(0.60), radius: 4, x: 0, y: 2)
+        .shadow(color: RD.Palette.gemCore.opacity(pressed ? 0.22 : 0.36), radius: pressed ? 4 : shadowRadius, x: 0, y: pressed ? 1 : 2)
+        .shadow(color: RD.Palette.secondaryButtonShadow, radius: 4, x: 0, y: 2)
     }
 }
 
@@ -546,8 +720,8 @@ struct RDGemPlayMark: View {
                         lineWidth: innerWidth
                     )
             }
-            .shadow(color: RD.Palette.gemCore.opacity(0.50), radius: max(3, size * 0.16), x: 0, y: max(1, size * 0.05))
-            .shadow(color: .black.opacity(0.68), radius: max(2, size * 0.10), x: 0, y: max(1, size * 0.04))
+            .shadow(color: RD.Palette.gemGlow, radius: max(3, size * 0.16), x: 0, y: max(1, size * 0.05))
+            .shadow(color: RD.Palette.posterShadow, radius: max(2, size * 0.10), x: 0, y: max(1, size * 0.04))
             .frame(width: size, height: size)
             .accessibilityHidden(true)
     }
@@ -571,7 +745,7 @@ private struct RDGemButtonSurface<S: InsettableShape>: View {
                     shape.fill(RD.Palette.surfaceRaised)
                     shape.strokeBorder(RD.Gem.cardBorderGradient, lineWidth: 0.75)
                 }
-                .shadow(color: .black.opacity(0.42), radius: 5, x: 0, y: 3)
+                .shadow(color: RD.Palette.secondaryButtonShadow, radius: 5, x: 0, y: 3)
             }
         }
         .opacity(isEnabled ? (isPressed ? 0.90 : 1.0) : 0.45)
@@ -631,7 +805,7 @@ struct RDGemPillButtonStyle: ButtonStyle {
     }
 }
 
-/// 次级暗色玻璃按钮（干净烟熏玻璃 + 极细冷银棱边）。
+/// 次级玻璃按钮（页面级自适应磨砂玻璃 + 极细棱边；在深色播放器环境自动维持暗色玻璃）。
 struct RDGemSecondaryButtonStyle: ButtonStyle {
     var capsule: Bool = true
     var horizontalPadding: CGFloat = 14
@@ -642,16 +816,15 @@ struct RDGemSecondaryButtonStyle: ButtonStyle {
         let shape = RoundedRectangle(cornerRadius: radius, style: .continuous)
         configuration.label
             .font(RD.Font.caption.weight(.bold))
-            .foregroundStyle(.white.opacity(0.92))
+            .foregroundStyle(RD.Palette.textPrimary.opacity(0.92))
             .padding(.horizontal, horizontalPadding)
             .padding(.vertical, verticalPadding)
             .background {
                 ZStack {
                     shape.fill(.ultraThinMaterial.opacity(0.68))
-                    shape.fill(Color(red: 24/255, green: 24/255, blue: 28/255).opacity(0.55))
+                    shape.fill(RD.Palette.glassSecondaryFill)
                     shape.strokeBorder(RD.Gem.cardBorderGradient, lineWidth: 0.75)
                 }
-                .environment(\.colorScheme, .dark)
             }
             .scaleEffect(configuration.isPressed ? 0.96 : 1)
             .opacity(configuration.isPressed ? 0.84 : 1)
@@ -665,7 +838,7 @@ struct RDPrimaryButtonStyle: ButtonStyle {
         let shape = RoundedRectangle(cornerRadius: RD.Radius.control, style: .continuous)
         configuration.label
             .font(RD.Font.headline.weight(filled ? .bold : .semibold))
-            .foregroundStyle(Color.white)
+            .foregroundStyle(filled ? Color.white : RD.Palette.textPrimary)
             .frame(maxWidth: .infinity, minHeight: 44)
             .background { RDGemButtonSurface(shape: shape, isPressed: configuration.isPressed, filled: filled) }
             .scaleEffect(configuration.isPressed ? 0.965 : 1)
@@ -680,28 +853,33 @@ struct RDWhiteHeroButtonStyle: ButtonStyle {
     }
 }
 
-/// Hero 玻璃次按钮（如「详情」——干净烟熏半透玻璃 + 顶部冷银细棱）。
+/// Hero 玻璃次按钮（如「详情」——压在海报媒体上保留深色半透玻璃，落在页面背景时跟随系统明暗）。
 struct RDGlassHeroButtonStyle: ButtonStyle {
     var minHeight: CGFloat = 44
     var capsule: Bool = false
+    var mediaOverlay: Bool = true
 
     func makeBody(configuration: Configuration) -> some View {
         let radius: CGFloat = capsule ? 999 : RD.Radius.control
         let shape = RoundedRectangle(cornerRadius: radius, style: .continuous)
         configuration.label
             .font(RD.Font.headline)
-            .foregroundStyle(.white)
+            .foregroundStyle(mediaOverlay ? Color.white : RD.Palette.textPrimary)
             .frame(maxWidth: capsule ? nil : .infinity, minHeight: minHeight)
             .padding(.horizontal, capsule ? 18 : 0)
             .background {
-                ZStack {
+                let bg = ZStack {
                     shape.fill(.ultraThinMaterial.opacity(0.70))
-                    shape.fill(Color(red: 22/255, green: 22/255, blue: 26/255).opacity(0.52))
-                    shape.strokeBorder(RD.Gem.posterBorderGradient, lineWidth: 0.75)
+                    shape.fill(mediaOverlay ? Color(red: 22/255, green: 22/255, blue: 26/255).opacity(0.52) : RD.Palette.glassSecondaryFill)
+                    shape.strokeBorder(mediaOverlay ? RD.Gem.posterBorderGradient : RD.Gem.cardBorderGradient, lineWidth: 0.75)
                 }
-                .environment(\.colorScheme, .dark)
+                if mediaOverlay {
+                    bg.environment(\.colorScheme, .dark)
+                } else {
+                    bg
+                }
             }
-            .shadow(color: .black.opacity(0.38), radius: 6, y: 3)
+            .shadow(color: mediaOverlay ? .black.opacity(0.38) : RD.Palette.secondaryButtonShadow, radius: 6, y: 3)
             .scaleEffect(configuration.isPressed ? 0.96 : 1)
             .opacity(configuration.isPressed ? 0.84 : 1)
             .animation(RD.Motion.press, value: configuration.isPressed)
@@ -753,7 +931,7 @@ struct RDCard: ViewModifier {
                         // 仅在关键锚点卡使用收敛深石榴内透与斜角反光
                         shape.fill(
                             RadialGradient(
-                                colors: [RD.Palette.gemDeep.opacity(0.34), RD.Palette.gemAbyss.opacity(0.12), .clear],
+                                colors: [RD.Palette.anchorCardGlowTop, RD.Palette.anchorCardGlowMid, .clear],
                                 center: .topLeading,
                                 startRadius: 6,
                                 endRadius: 230
@@ -762,7 +940,7 @@ struct RDCard: ViewModifier {
                         RDGemTopFacetPath()
                             .fill(
                                 LinearGradient(
-                                    colors: [RD.Palette.gemFilament.opacity(0.08), .clear],
+                                    colors: [RD.Palette.cardSheenTop, .clear],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 )
@@ -771,7 +949,7 @@ struct RDCard: ViewModifier {
                     } else {
                         VStack(spacing: 0) {
                             LinearGradient(
-                                colors: [.white.opacity(0.05), .clear],
+                                colors: [RD.Palette.cardSheenTop, .clear],
                                 startPoint: .top,
                                 endPoint: .bottom
                             )
@@ -790,7 +968,7 @@ struct RDCard: ViewModifier {
                         .allowsHitTesting(false)
                 }
             }
-            .shadow(color: glow ? RD.Palette.gemCore.opacity(0.20) : .black.opacity(0.30), radius: glow ? 8 : 5, x: 0, y: 3)
+            .shadow(color: glow ? RD.Palette.gemGlow : RD.Palette.cardShadow, radius: glow ? 8 : 5, x: 0, y: 3)
     }
 }
 
@@ -801,7 +979,7 @@ struct RDGemPosterChrome: ViewModifier {
         let shape = RoundedRectangle(cornerRadius: radius, style: .continuous)
         content
             .clipShape(shape)
-            // 次要海报框退回干净暗色玻璃棱边，零模糊红圈，让宝石徽标与主按钮成为视觉焦点
+            // 次要海报框退回干净玻璃棱边，零模糊红圈，让宝石徽标与主按钮成为视觉焦点
             .overlay(alignment: .top) {
                 LinearGradient(
                     colors: [.white.opacity(0.16), .clear],
@@ -817,7 +995,19 @@ struct RDGemPosterChrome: ViewModifier {
                     .strokeBorder(RD.Gem.posterBorderGradient, lineWidth: 0.65)
                     .allowsHitTesting(false)
             }
-            .shadow(color: .black.opacity(0.50), radius: 6, x: 0, y: 3)
+            .shadow(color: RD.Palette.posterShadow, radius: 6, x: 0, y: 3)
+    }
+}
+
+private struct RDAdaptiveTitleShadowModifier: ViewModifier {
+    @Environment(\.colorScheme) private var colorScheme
+
+    func body(content: Content) -> some View {
+        if colorScheme == .dark {
+            content.shadow(color: .black.opacity(0.55), radius: 4, y: 1.5)
+        } else {
+            content
+        }
     }
 }
 
@@ -830,7 +1020,7 @@ extension View {
         modifier(RDCard(radius: radius, fill: fill, border: true, glow: glow))
     }
 
-    /// 宝石海报容器修饰器：玻璃高光棱边 + 半透明亮红描边 + 红色辉光，封面图片本身零重绘零滤镜。
+    /// 宝石海报容器修饰器：玻璃高光棱边 + 干净细描边，封面图片本身零重绘零滤镜。
     func rdGemPosterChrome(radius: CGFloat = RD.Radius.poster) -> some View {
         modifier(RDGemPosterChrome(radius: radius))
     }
@@ -840,7 +1030,7 @@ extension View {
         rdGemPosterChrome(radius: radius)
     }
 
-    /// 全屏纯黑底（#141414）。
+    /// 全屏自适应页面底色。
     func rdScreen() -> some View {
         background(RD.Palette.background.ignoresSafeArea())
     }
@@ -848,14 +1038,17 @@ extension View {
     /// 借 DouDuo 的 themeShadow：叠在媒体上的文字投影。
     func rdMediaShadow() -> some View { shadow(color: .black.opacity(0.55), radius: 4, y: 1.5) }
 
-    /// 借 DouDuo 的 ddMediaGlassCircle：iOS 26 液态玻璃圆底（系统级播放器 HUD 保持原样）。
+    /// 页面标题微投影：深色下保留立体压边，浅色下保持干净无脏边。
+    func rdTitleShadow() -> some View { modifier(RDAdaptiveTitleShadowModifier()) }
+
+    /// 借 DouDuo 的 ddMediaGlassCircle：iOS 26 液态玻璃圆底（跟随所在容器 colorScheme；播放器舞台保持深色）。
     func rdGlassCircle() -> some View {
-        foregroundStyle(.white).glassEffect(.regular.interactive(), in: .circle).environment(\.colorScheme, .dark)
+        foregroundStyle(RD.Palette.textPrimary).glassEffect(.regular.interactive(), in: .circle)
     }
 
-    /// 借 DouDuo 的 ddMediaGlassCapsule：iOS 26 液态玻璃胶囊（系统级播放器 HUD 保持原样）。
+    /// 借 DouDuo 的 ddMediaGlassCapsule：iOS 26 液态玻璃胶囊（跟随所在容器 colorScheme；播放器舞台保持深色）。
     func rdGlassCircleCapsule() -> some View {
-        foregroundStyle(.white).glassEffect(.regular.interactive(), in: .capsule).environment(\.colorScheme, .dark)
+        foregroundStyle(RD.Palette.textPrimary).glassEffect(.regular.interactive(), in: .capsule)
     }
 }
 
@@ -935,8 +1128,8 @@ struct RDStatusBadgePill: View {
         let shape = RoundedRectangle(cornerRadius: 5, style: .continuous)
         let pipColor: Color = switch kind {
         case .updated: RD.Palette.gemCaustic
-        case .completed: RD.Palette.platinum
-        case .offline: RD.Palette.pearl
+        case .completed: RD.Palette.mediaSilver
+        case .offline: RD.Palette.mediaPearl
         }
         let borderColor: Color = switch kind {
         case .updated: RD.Palette.gemBorder
@@ -972,7 +1165,7 @@ struct RDRankNumberView: View {
             Text(label)
                 .font(font)
                 .tracking(tracking)
-                .foregroundStyle(Color.black.opacity(0.92))
+                .foregroundStyle(RD.Palette.rankBevelShadow)
                 .offset(x: 1.1, y: 1.2)
 
             // 2. 左上「一线亮」晶体折射锋芒
@@ -1013,8 +1206,8 @@ struct RDRankNumberView: View {
                     )
                 )
         }
-        .shadow(color: topTier ? RD.Palette.gemCore.opacity(0.45) : .clear, radius: 6, y: 2)
-        .shadow(color: .black.opacity(0.75), radius: 4, y: 2)
+        .shadow(color: topTier ? RD.Palette.gemGlow : .clear, radius: 6, y: 2)
+        .shadow(color: RD.Palette.posterShadow, radius: 4, y: 2)
         .accessibilityHidden(true)
     }
 }
@@ -1032,7 +1225,7 @@ struct RDNotice: View {
             Spacer(minLength: 0)
             Button(actionTitle, action: action)
                 .font(RD.Font.caption.weight(.bold))
-                .foregroundStyle(RD.Palette.gemRim)
+                .foregroundStyle(RD.Palette.gemAccentText)
         }
         .padding(RD.Space.md)
         .rdCard(fill: RD.Palette.surface, border: false)
@@ -1045,8 +1238,8 @@ struct RDAmbientTopGlow: View {
     var body: some View {
         RadialGradient(
             colors: [
-                RD.Palette.gemDeep.opacity(0.24),
-                RD.Palette.gemAbyss.opacity(0.08),
+                RD.Palette.ambientTopGlowStrong,
+                RD.Palette.ambientTopGlowSoft,
                 .clear
             ],
             center: .topLeading,
@@ -1060,14 +1253,17 @@ struct RDAmbientTopGlow: View {
     }
 }
 
-/// 滚动吸顶磨砂栏背景（与 HomeView 一致，随滚动平滑浮现）。
+/// 滚动吸顶磨砂栏背景（与 HomeView 一致，随滚动平滑浮现并跟随明暗外观）。
 struct RDStickyTopBarBackground: View {
     let scrolled: Bool
 
     var body: some View {
         ZStack(alignment: .bottom) {
             LinearGradient(
-                colors: [.black.opacity(scrolled ? 0.92 : 0.65), .black.opacity(scrolled ? 0.78 : 0)],
+                colors: [
+                    RD.Palette.background.opacity(scrolled ? 0.92 : 0.65),
+                    RD.Palette.background.opacity(scrolled ? 0.78 : 0)
+                ],
                 startPoint: .top,
                 endPoint: .bottom
             )
@@ -1086,7 +1282,6 @@ struct RDStickyTopBarBackground: View {
                     .frame(height: 0.6)
             }
         }
-        .environment(\.colorScheme, .dark)
         .ignoresSafeArea(edges: [.top, .horizontal])
         .allowsHitTesting(false)
     }
@@ -1109,12 +1304,12 @@ struct RDEmptyStateView: View {
                     .overlay(
                         Circle().strokeBorder(RD.Gem.anchorBorderGradient, lineWidth: 0.9)
                     )
-                    .shadow(color: RD.Palette.gemCore.opacity(0.24), radius: 7, y: 2)
+                    .shadow(color: RD.Palette.gemGlow, radius: 7, y: 2)
                 Image(systemName: systemImage)
                     .font(.system(size: 25, weight: .semibold))
                     .foregroundStyle(
                         LinearGradient(
-                            colors: [.white, RD.Palette.gemRim],
+                            colors: [RD.Palette.textPrimary, RD.Palette.gemAccentText],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
@@ -1122,7 +1317,7 @@ struct RDEmptyStateView: View {
             }
             Text(title)
                 .font(RD.Font.title)
-                .foregroundStyle(.white)
+                .foregroundStyle(RD.Palette.textPrimary)
             Text(subtitle)
                 .font(RD.Font.body)
                 .foregroundStyle(RD.Palette.textSecondary)
@@ -1155,7 +1350,7 @@ struct RDShimmerModifier: ViewModifier {
                         colors: [
                             .clear,
                             RD.Palette.gemDeep.opacity(0.10),
-                            Color.white.opacity(0.12),
+                            RD.Palette.shimmerHighlight,
                             .clear
                         ],
                         startPoint: .topLeading,
@@ -1219,7 +1414,7 @@ struct RDHomeSkeletonView: View {
                     RDSkeletonBox(cornerRadius: 6, fill: RD.Palette.surfaceRaised)
                         .frame(width: min(cardWidth * (wide ? 0.44 : 0.62), 260), height: 14)
                     HStack(spacing: RD.Space.md) {
-                        RDSkeletonBox(cornerRadius: 999, fill: RD.Palette.gemDeep.opacity(0.55), gemBorder: true)
+                        RDSkeletonBox(cornerRadius: 999, fill: RD.Palette.accentGlow, gemBorder: true)
                             .frame(width: 118, height: 40)
                         RDSkeletonBox(cornerRadius: 999, fill: RD.Palette.surfaceRaised)
                             .frame(width: 96, height: 40)
@@ -1310,7 +1505,7 @@ struct RDHistorySkeletonView: View {
                 RDSkeletonBox(cornerRadius: RD.Radius.poster, fill: RD.Palette.surfaceRaised, gemBorder: true)
                     .frame(width: 84, height: 124)
                 VStack(alignment: .leading, spacing: 10) {
-                    RDSkeletonBox(cornerRadius: 4, fill: RD.Palette.gemDeep.opacity(0.45), gemBorder: true)
+                    RDSkeletonBox(cornerRadius: 4, fill: RD.Palette.accentGlow, gemBorder: true)
                         .frame(width: 68, height: 18)
                     RDSkeletonBox(cornerRadius: 6, fill: RD.Palette.surfaceRaised)
                         .frame(height: 20)
@@ -1393,7 +1588,7 @@ struct RemoteCover: View {
             RDSkeletonBox(cornerRadius: 0, fill: RD.Palette.surface)
             Image(systemName: "play.rectangle.fill")
                 .font(.system(size: 24))
-                .foregroundStyle(.white.opacity(0.14))
+                .foregroundStyle(RD.Palette.textTertiary.opacity(0.45))
         }
     }
 }
@@ -1489,7 +1684,7 @@ struct RDHeroArtworkView: View {
                     .frame(width: width, height: artworkHeight)
                     .scaleEffect(1.16)
                     .blur(radius: 28)
-                    .overlay(Color.black.opacity(0.45))
+                    .overlay(RD.Palette.compactHeroWingMist)
                     .clipped()
 
                 Image(uiImage: img)
@@ -1519,7 +1714,7 @@ struct RDHeroArtworkView: View {
                     .frame(width: width, height: artworkHeight)
                     .scaleEffect(1.14)
                     .blur(radius: 26)
-                    .overlay(Color.black.opacity(0.50))
+                    .overlay(RD.Palette.compactHeroWingMist)
                     .clipped()
 
                 Image(uiImage: img)

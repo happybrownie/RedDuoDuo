@@ -106,8 +106,8 @@ struct SearchView: View {
                 RDGemPlayMark(size: 22)
                 Text("搜索")
                     .font(RD.Font.rowTitle)
-                    .foregroundStyle(.white)
-                    .rdMediaShadow()
+                    .foregroundStyle(RD.Palette.textPrimary)
+                    .rdTitleShadow()
             }
             .opacity(scrolled ? 1 : 0)
 
@@ -128,8 +128,8 @@ struct SearchView: View {
             RDBadgePill(text: "发现漫剧", accent: true)
             Text("搜索")
                 .font(RD.Font.displayLarge)
-                .foregroundStyle(.white)
-                .rdMediaShadow()
+                .foregroundStyle(RD.Palette.textPrimary)
+                .rdTitleShadow()
                 .accessibilityAddTraits(.isHeader)
             Text("全站片库检索与关键词联想")
                 .font(RD.Font.body)
@@ -143,13 +143,13 @@ struct SearchView: View {
         HStack(spacing: 10) {
             Image(systemName: "magnifyingglass")
                 .font(.system(size: 15, weight: .semibold))
-                .foregroundStyle(searchFocused ? RD.Palette.gemRim : RD.Palette.textSecondary)
+                .foregroundStyle(searchFocused ? RD.Palette.gemAccentText : RD.Palette.textSecondary)
 
             TextField("搜剧名 / 关键词", text: $query)
                 .focused($searchFocused)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
-                .foregroundStyle(.white)
+                .foregroundStyle(RD.Palette.textPrimary)
                 .submitLabel(.search)
                 .onSubmit { runSearch() }
 
@@ -163,7 +163,7 @@ struct SearchView: View {
                     error = nil
                 } label: {
                     Image(systemName: "xmark.circle.fill")
-                        .foregroundStyle(.white.opacity(0.48))
+                        .foregroundStyle(RD.Palette.textTertiary)
                 }
             }
 
@@ -212,7 +212,7 @@ struct SearchView: View {
                                 HStack(spacing: 4) {
                                     Image(systemName: "clock.arrow.circlepath")
                                         .font(.system(size: 10, weight: .semibold))
-                                        .foregroundStyle(selected ? .white : RD.Palette.gemRim.opacity(0.8))
+                                        .foregroundStyle(selected ? .white : RD.Palette.gemAccentText.opacity(0.85))
                                     Text(word)
                                         .font(RD.Font.caption.weight(.semibold))
                                 }
@@ -227,13 +227,13 @@ struct SearchView: View {
                             } label: {
                                 Image(systemName: "xmark")
                                     .font(.system(size: 9, weight: .bold))
-                                    .foregroundStyle(.white.opacity(0.55))
+                                    .foregroundStyle(selected ? Color.white.opacity(0.78) : RD.Palette.textTertiary)
                             }
                             .buttonStyle(.plain)
                         }
                         .padding(.horizontal, 12)
                         .padding(.vertical, 7)
-                        .foregroundStyle(selected ? .white : .white.opacity(0.88))
+                        .foregroundStyle(selected ? .white : RD.Palette.textPrimary.opacity(0.88))
                                 .background {
                                     if selected {
                                         RDGemFacetSurface(shape: Capsule(style: .continuous), shadowRadius: 4, borderWidth: 0.8)
@@ -270,7 +270,7 @@ struct SearchView: View {
                         .font(RD.Font.caption.weight(.semibold))
                         .padding(.horizontal, 13)
                         .padding(.vertical, 7)
-                        .foregroundStyle(selected ? .white : .white.opacity(0.86))
+                        .foregroundStyle(selected ? .white : RD.Palette.textPrimary.opacity(0.86))
                         .background {
                             if selected {
                                 RDGemFacetSurface(shape: Capsule(style: .continuous), shadowRadius: 4, borderWidth: 0.8)
@@ -346,7 +346,7 @@ struct SearchView: View {
                                     RDGemPlayMark(size: 20)
                                     Text(s.text)
                                         .font(RD.Font.headline)
-                                        .foregroundStyle(.white)
+                                        .foregroundStyle(RD.Palette.textPrimary)
                                         .lineLimit(1)
                                     Spacer()
                                     Image(systemName: "chevron.right")

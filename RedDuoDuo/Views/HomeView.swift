@@ -207,8 +207,8 @@ struct HomeView: View {
                 RDGemPlayMark(size: 28)
                 Text("红果漫剧")
                     .font(.system(size: 20, weight: .black))
-                    .foregroundStyle(.white)
-                    .rdMediaShadow()
+                    .foregroundStyle(RD.Palette.textPrimary)
+                    .rdTitleShadow()
             }
 
             Spacer(minLength: 6)
@@ -225,7 +225,7 @@ struct HomeView: View {
                 HStack(spacing: 4) {
                     Image(systemName: "flame.fill")
                         .font(.system(size: 11, weight: .bold))
-                        .foregroundStyle(RD.Palette.gemRim)
+                        .foregroundStyle(RD.Palette.gemAccentText)
                     Text(wide ? "第一集试看" : "试看")
                         .font(RD.Font.caption.weight(.bold))
                 }
@@ -241,7 +241,7 @@ struct HomeView: View {
             } label: {
                 HStack(spacing: 4) {
                     if pickingRandom {
-                        ProgressView().controlSize(.mini).tint(.white)
+                        ProgressView().controlSize(.mini).tint(RD.Palette.textPrimary)
                     } else {
                         Image(systemName: "dice.fill")
                             .font(.system(size: 11, weight: .bold))
@@ -413,7 +413,7 @@ struct HomeView: View {
                         HStack(spacing: 3) {
                             Image(systemName: "star.fill")
                                 .font(.system(size: 9))
-                                .foregroundStyle(RD.Palette.platinum)
+                                .foregroundStyle(RD.Palette.mediaSilver)
                             Text(hero.score)
                                 .font(RD.Font.micro)
                                 .foregroundStyle(.white)
@@ -434,7 +434,7 @@ struct HomeView: View {
 
                 Text(heroMetaLine(hero))
                     .font(RD.Font.caption.weight(.semibold))
-                    .foregroundStyle(RD.Palette.textSecondary)
+                    .foregroundStyle(RD.Palette.mediaTextSecondary)
                     .lineLimit(1)
                     .frame(maxWidth: cardWidth * 0.48, alignment: .leading)
                     .rdMediaShadow()
@@ -458,7 +458,7 @@ struct HomeView: View {
                     NavigationLink(value: hero) {
                         Label("详情", systemImage: "info.circle")
                     }
-                    .buttonStyle(RDGlassHeroButtonStyle(minHeight: 42, capsule: true))
+                    .buttonStyle(RDGlassHeroButtonStyle(minHeight: 42, capsule: true, mediaOverlay: true))
                     .simultaneousGesture(TapGesture().onEnded {
                         RDHaptics.shared.playGlassHeroTap()
                     })
@@ -472,15 +472,11 @@ struct HomeView: View {
         .clipShape(cardShape)
         .overlay(
             cardShape.strokeBorder(
-                LinearGradient(
-                    colors: [Color.white.opacity(0.22), Color.white.opacity(0.06)],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                ),
+                RD.Gem.posterBorderGradient,
                 lineWidth: 0.75
             )
         )
-        .shadow(color: .black.opacity(0.55), radius: 14, y: 6)
+        .shadow(color: RD.Palette.posterShadow, radius: 14, y: 6)
     }
 
     private func compactHeroSection(
@@ -550,7 +546,7 @@ struct HomeView: View {
                         HStack(spacing: 3) {
                             Image(systemName: "star.fill")
                                 .font(.system(size: 9))
-                                .foregroundStyle(RD.Palette.platinum)
+                                .foregroundStyle(RD.Palette.mediaSilver)
                             Text(hero.score)
                                 .font(RD.Font.micro)
                                 .foregroundStyle(.white)
@@ -563,10 +559,10 @@ struct HomeView: View {
 
                 Text(hero.title)
                     .font(.system(size: 26, weight: .black))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(RD.Palette.textPrimary)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
-                    .rdMediaShadow()
+                    .rdTitleShadow()
 
                 Text(heroMetaLine(hero))
                     .font(RD.Font.caption.weight(.semibold))
@@ -591,7 +587,7 @@ struct HomeView: View {
                     NavigationLink(value: hero) {
                         Label("详情", systemImage: "info.circle")
                     }
-                    .buttonStyle(RDGlassHeroButtonStyle(minHeight: 40, capsule: true))
+                    .buttonStyle(RDGlassHeroButtonStyle(minHeight: 40, capsule: true, mediaOverlay: false))
                     .simultaneousGesture(TapGesture().onEnded {
                         RDHaptics.shared.playGlassHeroTap()
                     })
@@ -687,7 +683,7 @@ struct HomeView: View {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("帮我挑一部")
                             .font(RD.Font.headline.weight(.bold))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(RD.Palette.textPrimary)
                         Text("随机盲盒开播第 1 集")
                             .font(.caption2)
                             .foregroundStyle(RD.Palette.textSecondary)
@@ -695,7 +691,7 @@ struct HomeView: View {
                     Spacer(minLength: 0)
                     Image(systemName: "play.circle.fill")
                         .font(.title3)
-                        .foregroundStyle(RD.Palette.gemRim)
+                        .foregroundStyle(RD.Palette.gemAccentText)
                 }
                 .padding(12)
                 .rdGemCard(radius: RD.Radius.card, fill: RD.Palette.surface, glow: true)
@@ -727,7 +723,7 @@ struct HomeView: View {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("第一集黄金钩子")
                             .font(RD.Font.headline.weight(.bold))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(RD.Palette.textPrimary)
                         Text("上下滑连刷第 1 集试看流")
                             .font(.caption2)
                             .foregroundStyle(RD.Palette.textSecondary)
@@ -906,7 +902,7 @@ struct HomeView: View {
         Button(action: action) {
             Text(title)
                 .font(RD.Font.caption.weight(.bold))
-                .foregroundStyle(active ? .white : .white.opacity(0.84))
+                .foregroundStyle(active ? .white : RD.Palette.textPrimary.opacity(0.86))
                 .padding(.horizontal, 13)
                 .padding(.vertical, 7)
                 .background {
@@ -1321,7 +1317,7 @@ private struct TopRankCard: View {
                             HStack(spacing: 2) {
                                 Image(systemName: "star.fill")
                                     .font(.system(size: 7.5))
-                                    .foregroundStyle(RD.Palette.platinum)
+                                    .foregroundStyle(RD.Palette.mediaSilver)
                                 Text(series.score)
                             }
                             .font(RD.Font.micro)
@@ -1343,8 +1339,8 @@ private struct TopRankCard: View {
                         RoundedRectangle(cornerRadius: RD.Radius.poster, style: .continuous)
                             .strokeBorder(isTop3 ? RD.Gem.anchorBorderGradient : RD.Gem.posterBorderGradient, lineWidth: isTop3 ? 0.9 : 0.7)
                     }
-                    .shadow(color: isTop3 ? RD.Palette.gemCore.opacity(0.28) : .clear, radius: 6, y: 2)
-                    .shadow(color: .black.opacity(0.55), radius: 6, y: 3)
+                    .shadow(color: isTop3 ? RD.Palette.gemGlow : .clear, radius: 6, y: 2)
+                    .shadow(color: RD.Palette.posterShadow, radius: 6, y: 3)
                     .padding(.leading, rank >= 10 ? 34 : 26)
 
                 RDRankNumberView(rank: rank)
@@ -1355,13 +1351,13 @@ private struct TopRankCard: View {
             .padding(.bottom, 6)
             .background {
                 plaqueShape
-                    .fill(RD.Palette.surface.opacity(0.88))
+                    .fill(RD.Palette.surface.opacity(0.92))
                     .overlay {
                         if isTop3 {
                             plaqueShape
                                 .fill(
                                     RadialGradient(
-                                        colors: [RD.Palette.gemDeep.opacity(0.32), .clear],
+                                        colors: [RD.Palette.anchorCardGlowTop, .clear],
                                         center: .bottomLeading,
                                         startRadius: 4,
                                         endRadius: 110
@@ -1533,7 +1529,7 @@ struct SeriesCard: View {
                         HStack(spacing: 2) {
                             Image(systemName: "star.fill")
                                 .font(.system(size: 8))
-                                .foregroundStyle(RD.Palette.platinum)
+                                .foregroundStyle(RD.Palette.mediaSilver)
                             Text(series.score)
                         }
                         .font(RD.Font.micro)

@@ -18,7 +18,6 @@ struct RedDuoDuoApp: App {
             RootTabView()
                 .environmentObject(history)
                 .environmentObject(auth)
-                .preferredColorScheme(.dark)
         }
     }
 }
@@ -26,12 +25,12 @@ struct RedDuoDuoApp: App {
 struct RootTabView: View {
     @State private var selection = 0
     init() {
-        // Netflix 式暗色半透明磨砂底栏、选中项品牌红
+        // 自适应明暗半透明磨砂底栏、选中项品牌红
         let ap = UITabBarAppearance()
         ap.configureWithDefaultBackground()
-        ap.backgroundEffect = UIBlurEffect(style: .systemChromeMaterialDark)
-        ap.backgroundColor = UIColor(RD.Palette.background).withAlphaComponent(0.84)
-        ap.shadowColor = UIColor(RD.Palette.hairline)
+        ap.backgroundEffect = UIBlurEffect(style: .systemChromeMaterial)
+        ap.backgroundColor = RD.Palette.tabBarBackgroundUI
+        ap.shadowColor = RD.Palette.hairlineUI
         UITabBar.appearance().standardAppearance = ap
         UITabBar.appearance().scrollEdgeAppearance = ap
     }

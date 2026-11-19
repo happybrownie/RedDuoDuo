@@ -174,8 +174,8 @@ struct ProfileView: View {
                 RDGemPlayMark(size: 22)
                 Text("我的")
                     .font(RD.Font.rowTitle)
-                    .foregroundStyle(.white)
-                    .rdMediaShadow()
+                    .foregroundStyle(RD.Palette.textPrimary)
+                    .rdTitleShadow()
             }
             .opacity(scrolled ? 1 : 0)
 
@@ -217,8 +217,8 @@ struct ProfileView: View {
             }
             Text("我的")
                 .font(RD.Font.displayLarge)
-                .foregroundStyle(.white)
-                .rdMediaShadow()
+                .foregroundStyle(RD.Palette.textPrimary)
+                .rdTitleShadow()
                 .accessibilityAddTraits(.isHeader)
             Text(auth.isLoggedIn ? "账号信息、云端续播与个人书架" : "登录红果账号以同步云端记录与书架收藏")
                 .font(RD.Font.body)
@@ -243,7 +243,7 @@ struct ProfileView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(user.displayName)
                             .font(RD.Font.title)
-                            .foregroundStyle(.white)
+                            .foregroundStyle(RD.Palette.textPrimary)
                             .lineLimit(1)
                         if !user.userID.isEmpty {
                             Text("UID：\(user.userID)")
@@ -270,7 +270,7 @@ struct ProfileView: View {
                                 .shadow(color: RD.Palette.pearl.opacity(0.65), radius: 4)
                             Text("会话状态：已登录")
                                 .font(RD.Font.caption.weight(.bold))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(RD.Palette.textPrimary)
                         }
                         if let exp = sess.expiresAt {
                             Text("凭据有效期至 \(dateText(exp))")
@@ -308,7 +308,7 @@ struct ProfileView: View {
                         RDBadgePill(text: "红果通行证", accent: true)
                         Text("登录红果账号")
                             .font(RD.Font.title)
-                            .foregroundStyle(.white)
+                            .foregroundStyle(RD.Palette.textPrimary)
                     }
                     Spacer(minLength: 0)
                 }
@@ -391,7 +391,7 @@ struct ProfileView: View {
                                 VStack(alignment: .leading, spacing: 5) {
                                     Text(item.title.isEmpty ? "剧目 \(item.seriesID)" : item.title)
                                         .font(RD.Font.headline)
-                                        .foregroundStyle(.white)
+                                        .foregroundStyle(RD.Palette.textPrimary)
                                         .lineLimit(1)
                                     Text("第 \(item.episodeIndex) 集 · \(HistoryEntry.formatTime(item.positionSeconds))")
                                         .font(RD.Font.caption.weight(.semibold))
@@ -445,7 +445,7 @@ struct ProfileView: View {
                                 VStack(alignment: .leading, spacing: 5) {
                                     Text(item.title.isEmpty ? "剧目 ID \(item.seriesID)" : item.title)
                                         .font(RD.Font.headline)
-                                        .foregroundStyle(.white)
+                                        .foregroundStyle(RD.Palette.textPrimary)
                                         .lineLimit(1)
                                     Text(item.episodeCount > 0 ? "共 \(item.episodeCount) 集" : "点击查看详情")
                                         .font(RD.Font.caption)
@@ -566,7 +566,7 @@ struct ProfileView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(RD.Font.headline)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(RD.Palette.textPrimary)
                 Text(subtitle)
                     .font(.caption2)
                     .foregroundStyle(RD.Palette.textTertiary)
@@ -602,7 +602,7 @@ struct ProfileView: View {
                     ProgressView().controlSize(.small).tint(RD.Palette.gemBright)
                     Text("正在缓存：\(batchTitle)（\(offline.batchDoneCount)/\(offline.batchTotalCount)）")
                         .font(.caption2)
-                        .foregroundStyle(RD.Palette.gemRim)
+                        .foregroundStyle(RD.Palette.gemAccentText)
                         .lineLimit(1)
                     Spacer()
                     Button("停止") {
@@ -646,7 +646,7 @@ struct ProfileView: View {
                                     VStack(alignment: .leading, spacing: 4) {
                                         Text(group.title)
                                             .font(RD.Font.headline)
-                                            .foregroundStyle(.white)
+                                            .foregroundStyle(RD.Palette.textPrimary)
                                             .lineLimit(1)
                                         Text("已缓存 \(group.records.count) 集 · \(sizeText)")
                                             .font(RD.Font.caption.weight(.semibold))
@@ -714,7 +714,7 @@ struct ProfileView: View {
             }
             .padding(.bottom, 2)
 
-            Text("版本：RedDuoDuo 1.4.5 (1)")
+            Text("版本：RedDuoDuo 1.4.6 (1)")
             Text("固定设备 ID：\(deviceID.isEmpty ? (auth.currentDeviceID.isEmpty ? "待首次请求注册" : auth.currentDeviceID) : deviceID)")
                 .monospacedDigit()
             Text("Passport：security.snssdk.com · 业务：api5-normal-sinfonlinea.fqnovel.com")
@@ -748,10 +748,10 @@ struct ProfileView: View {
 
     private var avatarPlaceholder: some View {
         ZStack {
-            Circle().fill(RD.Palette.gemDeep.opacity(0.45))
+            Circle().fill(RD.Palette.watchedCellFill)
             Image(systemName: "person.crop.circle.fill")
                 .font(.system(size: 32))
-                .foregroundStyle(RD.Palette.gemRim)
+                .foregroundStyle(RD.Palette.gemAccentText)
         }
     }
 
