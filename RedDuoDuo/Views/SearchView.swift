@@ -1,11 +1,7 @@
 import SwiftUI
 
-/// 1.4.8 搜索「浮层画册」：
-/// 46 高胶囊搜索栏（聚焦出取消）→ 最近胶囊 → 两列热搜（1–3 白 / 4–10 灰）→ 3:4 海报网。
-/// 小屏 2 列（距 14，键入隐底栏）；大屏搜索/空闲区居中限 560，结果 5 列（距 16）。
 struct SearchView: View {
     @ObservedObject private var searchHistory = SearchHistoryStore.shared
-    @ObservedObject private var chrome = RDAlbumChrome.shared
 
     @State private var query = ""
     @State private var results: [Series] = []
@@ -16,59 +12,51 @@ struct SearchView: View {
     @State private var safeInsets = RDScreenMetrics.keyWindowSafeAreaInsets
     @State private var scrollOffset: CGFloat = 0
     @State private var wasScrolledPastTopBar = false
-    @State private var tint: RDAlbumTint?
     @FocusState private var searchFocused: Bool
 
-    private let hotWords = [
-        "灵葫仙缘", "御狐", "凡修逆仙", "末世第一粮仓", "开局签到荒古圣体",
-        "龙王殿", "神医下山", "都市最强狂兵", "重生都市修仙", "镇国战神"
-    ]
+    private let quick = ["灵葫仙缘", "御狐", "凡修逆仙", "末世第一粮仓"]
 
     var body: some View {
         NavigationStack {
             ZStack(alignment: .top) {
-                RDAlbumAmbientBackground(tint: tint)
-                RDAlbum.C.base.opacity(0.001).ignoresSafeArea()
+                RD.Palette.background.ignoresSafeArea()
+                RDAmbientTopGlow()
                 RDSafeAreaProbe(insets: $safeInsets)
 
                 GeometryReader { fullGeo in
                     let fullWidth = fullGeo.size.width
                     let wide = RD.isWide(fullWidth)
                     let horiz = RDLayoutInsets.horizontal(in: fullGeo)
-                    let leadingPad = max(horiz.leading, wide ? RDAlbum.Space.pageWide : RDAlbum.Space.pageSmall)
-                    let trailingPad = max(horiz.trailing, wide ? RDAlbum.Space.pageWide : RDAlbum.Space.pageSmall)
+                    let leadingPad = horiz.leading
+                    let trailingPad = horiz.trailing
                     let contentWidth = max(1, fullWidth - leadingPad - trailingPad)
                     let topClearance = max(safeInsets.top + 56, 68)
 
                     ZStack(alignment: .top) {
                         ScrollViewReader { scrollProxy in
-                            ScrollView(showsIndicators: false) {
-                                VStack(alignment: .leading, spacing: RDAlbum.Space.xl) {
+                            ScrollView {
+                                VStack(alignment: .leading, spacing: RD.Space.lg) {
                                     Color.clear.frame(height: 0).id("search-top-anchor")
 
-                                    pageHeader(wide: wide, leadingPad: leadingPad, trailingPad: trailingPad)
+                                    pageHeader
+                                        .padding(.leading, leadingPad)
+                                        .padding(.trailing, trailingPad)
 
-                                    searchBar(wide: wide, contentWidth: contentWidth)
-                                        .padding(.horizontal, leadingPad)
+                                    searchBar
+                                        .padding(.leading, leadingPad)
+                                        .padding(.trailing, trailingPad)
 
-                                    if searchFocused || query.trimmingCharacters(in: .whitespaces).isEmpty {
-                                        idleContent(
-                                            wide: wide,
-                                            contentWidth: contentWidth,
-                                            leadingPad: leadingPad,
-                                            trailingPad: trailingPad
-                                        )
-                                    } else {
-                                        resultContent(
-                                            wide: wide,
-                                            contentWidth: contentWidth,
-                                            leadingPad: leadingPad,
-                                            trailingPad: trailingPad
-                                        )
+                                    // A12: 个人搜索胶囊（最近搜过）
+                                    if !searchHistory.queries.isEmpty {
+                                        recentSearchChips(leadingPad: leadingPad, trailingPad: trailingPad)
                                     }
+
+                                    quickChips(leadingPad: leadingPad, trailingPad: trailingPad)
+
+                                    content(wide: wide, contentWidth: contentWidth, leadingPad: leadingPad, trailingPad: trailingPad)
                                 }
                                 .padding(.top, topClearance)
-                                .padding(.bottom, 96)
+                                .padding(.bottom, RD.Space.xl)
                                 .frame(width: fullWidth, alignment: .leading)
                             }
                             .onScrollGeometryChange(for: CGFloat.self) { geo in
@@ -81,10 +69,9 @@ struct SearchView: View {
                                 }
                                 wasScrolledPastTopBar = crossed
                             }
-                            .scrollDismissesKeyboard(.interactively)
                             .onReceive(NotificationCenter.default.publisher(for: .rdScrollToTop)) { note in
                                 if let tab = note.object as? Int, tab == 2 {
-                                    withAnimation(RDAlbum.Motion.rearrange) {
+                                    withAnimation(RD.Motion.snappy) {
                                         scrollProxy.scrollTo("search-top-anchor", anchor: .top)
                                     }
                                 }
@@ -106,15 +93,6 @@ struct SearchView: View {
                 if focused {
                     RDHaptics.shared.playSearchFocus()
                 }
-                chrome.setBrowseChromeHidden(focused, reason: "searchTyping")
-            }
-            .onDisappear {
-                if searchFocused { chrome.setBrowseChromeHidden(false, reason: "searchTyping") }
-            }
-            .task(id: results.first?.cover ?? "") {
-                let cover = results.first?.cover ?? ""
-                guard !cover.isEmpty else { tint = nil; return }
-                tint = await RDAlbumTintStore.shared.tint(for: cover)
             }
         }
     }
@@ -127,15 +105,16 @@ struct SearchView: View {
             HStack(spacing: 8) {
                 RDGemPlayMark(size: 22)
                 Text("搜索")
-                    .font(RDAlbum.Font.rounded(19, .bold))
-                    .foregroundStyle(RDAlbum.C.textPrimary)
+                    .font(RD.Font.rowTitle)
+                    .foregroundStyle(RD.Palette.textPrimary)
+                    .rdTitleShadow()
             }
             .opacity(scrolled ? 1 : 0)
 
             Spacer(minLength: 8)
         }
         .padding(.top, max(safeInsets.top + 6, 12))
-        .padding(.bottom, 8)
+        .padding(.bottom, 10)
         .padding(.leading, leadingPad)
         .padding(.trailing, trailingPad)
         .background {
@@ -144,344 +123,268 @@ struct SearchView: View {
         .animation(RD.Motion.fade, value: scrolled)
     }
 
-    private func pageHeader(wide: Bool, leadingPad: CGFloat, trailingPad: CGFloat) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
+    private var pageHeader: some View {
+        VStack(alignment: .leading, spacing: RD.Space.xs) {
+            RDBadgePill(text: "发现漫剧", accent: true)
             Text("搜索")
-                .font(RDAlbum.Font.pageTitle)
-                .foregroundStyle(RDAlbum.C.textPrimary)
+                .font(RD.Font.displayLarge)
+                .foregroundStyle(RD.Palette.textPrimary)
+                .rdTitleShadow()
                 .accessibilityAddTraits(.isHeader)
-            Text("全站片库检索 · 关键词联想")
-                .font(RDAlbum.Font.wideSub)
-                .tracking(1.8)
-                .foregroundStyle(RDAlbum.C.textSecondary)
+            Text("全站片库检索与关键词联想")
+                .font(RD.Font.body)
+                .foregroundStyle(RD.Palette.textSecondary)
         }
-        .frame(maxWidth: wide ? 560 : .infinity, alignment: .leading)
-        .padding(.horizontal, leadingPad)
     }
 
-    // MARK: - 46 高胶囊搜索栏
+    // MARK: - 宝石搜索框、最近搜过胶囊 & 热门关键词
 
-    private func searchBar(wide: Bool, contentWidth: CGFloat) -> some View {
+    private var searchBar: some View {
         HStack(spacing: 10) {
-            HStack(spacing: 10) {
-                Image(systemName: "magnifyingglass")
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(searchFocused ? RDAlbum.C.textPrimary : RDAlbum.C.textTertiary)
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(searchFocused ? RD.Palette.gemAccentText : RD.Palette.textSecondary)
 
-                TextField("搜剧名 / 关键词", text: $query)
-                    .focused($searchFocused)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .font(RDAlbum.Font.body)
-                    .foregroundStyle(RDAlbum.C.textPrimary)
-                    .submitLabel(.search)
-                    .onSubmit { runSearch() }
+            TextField("搜剧名 / 关键词", text: $query)
+                .focused($searchFocused)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .foregroundStyle(RD.Palette.textPrimary)
+                .submitLabel(.search)
+                .onSubmit { runSearch() }
 
-                if !query.isEmpty {
-                    Button {
-                        RDHaptics.shared.playSearchClear()
-                        query = ""
-                        results = []
-                        suggestions = []
-                        searched = false
-                        error = nil
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundStyle(RDAlbum.C.textTertiary)
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-            .padding(.horizontal, 16)
-            .frame(height: 46)
-            .rdAlbumGlass(Capsule(style: .continuous), kind: .nav, shadow: searchFocused)
-            .overlay {
-                Capsule(style: .continuous)
-                    .strokeBorder(searchFocused ? RDAlbum.C.textPrimary.opacity(0.22) : .clear, lineWidth: 0.8)
-            }
-            .animation(RDAlbum.Motion.glow, value: searchFocused)
-
-            if searchFocused {
-                Button("取消") {
+            if !query.isEmpty {
+                Button {
                     RDHaptics.shared.playSearchClear()
-                    searchFocused = false
-                    chrome.setBrowseChromeHidden(false, reason: "searchTyping")
+                    query = ""
+                    results = []
+                    suggestions = []
+                    searched = false
+                    error = nil
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(RD.Palette.textTertiary)
                 }
-                .font(RDAlbum.Font.pill)
-                .foregroundStyle(RDAlbum.C.textPrimary)
-                .transition(.opacity.combined(with: .move(edge: .trailing)))
             }
+
+            Button("搜索") {
+                searchFocused = false
+                runSearch()
+            }
+            .buttonStyle(RDGemPillButtonStyle(horizontalPadding: 16, verticalPadding: 8))
+            .disabled(query.trimmingCharacters(in: .whitespaces).isEmpty || loading)
         }
-        .frame(maxWidth: wide ? 560 : .infinity)
-        .frame(maxWidth: .infinity, alignment: wide ? .center : .leading)
-        .animation(RDAlbum.Motion.rearrange, value: searchFocused)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 9)
+        .rdGemCard(radius: RD.Radius.card, fill: RD.Palette.surfaceRaised, glow: searchFocused)
+        .animation(RD.Motion.fade, value: searchFocused)
     }
 
-    // MARK: - 空闲内容：最近 + 两列热搜
-
-    @ViewBuilder
-    private func idleContent(wide: Bool, contentWidth: CGFloat, leadingPad: CGFloat, trailingPad: CGFloat) -> some View {
-        VStack(alignment: .leading, spacing: RDAlbum.Space.xl) {
-            if !searchHistory.queries.isEmpty {
-                recentChips(leadingPad: leadingPad, trailingPad: trailingPad)
-            }
-            hotSearchBoard(wide: wide, leadingPad: leadingPad, trailingPad: trailingPad)
-
-            if !suggestions.isEmpty {
-                suggestionBoard(leadingPad: leadingPad, trailingPad: trailingPad)
-            }
-        }
-        .frame(maxWidth: wide ? 560 : .infinity)
-        .frame(maxWidth: .infinity, alignment: .center)
-    }
-
-    private func recentChips(leadingPad: CGFloat, trailingPad: CGFloat) -> some View {
-        VStack(alignment: .leading, spacing: RDAlbum.Space.sm) {
+    private func recentSearchChips(leadingPad: CGFloat, trailingPad: CGFloat) -> some View {
+        VStack(alignment: .leading, spacing: RD.Space.sm) {
             HStack {
-                RDAlbumSectionHeader(title: "最近搜过", showsChevron: false)
-                Button("清空") {
+                RDSectionHeader(title: "最近搜过", showsChevron: false, accentMark: true)
+                Button {
                     RDHaptics.shared.playSearchClear()
-                    withAnimation(RDAlbum.Motion.rearrange) { searchHistory.clear() }
+                    withAnimation(RD.Motion.snappy) {
+                        searchHistory.clear()
+                    }
+                } label: {
+                    Text("清空")
+                        .font(RD.Font.caption.weight(.bold))
+                        .foregroundStyle(RD.Palette.textTertiary)
                 }
-                .font(RDAlbum.Font.plateSub.weight(.semibold))
-                .foregroundStyle(RDAlbum.C.textTertiary)
             }
-            .padding(.horizontal, leadingPad)
+            .padding(.leading, leadingPad)
+            .padding(.trailing, trailingPad)
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     ForEach(searchHistory.queries, id: \.self) { word in
+                        let selected = query.trimmingCharacters(in: .whitespacesAndNewlines) == word
                         HStack(spacing: 6) {
                             Button {
                                 RDHaptics.shared.playChipSelect()
                                 query = word
                                 searchFocused = false
-                                chrome.setBrowseChromeHidden(false, reason: "searchTyping")
                                 runSearch()
                             } label: {
-                                HStack(spacing: 5) {
+                                HStack(spacing: 4) {
                                     Image(systemName: "clock.arrow.circlepath")
                                         .font(.system(size: 10, weight: .semibold))
-                                        .foregroundStyle(RDAlbum.C.textSecondary)
+                                        .foregroundStyle(selected ? .white : RD.Palette.gemAccentText.opacity(0.85))
                                     Text(word)
-                                        .font(RDAlbum.Font.rounded(13, .semibold))
-                                        .foregroundStyle(RDAlbum.C.textPrimary)
+                                        .font(RD.Font.caption.weight(.semibold))
                                 }
                             }
                             .buttonStyle(.plain)
 
                             Button {
                                 RDHaptics.shared.playSearchClear()
-                                withAnimation(RDAlbum.Motion.rearrange) { searchHistory.remove(word) }
+                                withAnimation(RD.Motion.snappy) {
+                                    searchHistory.remove(word)
+                                }
                             } label: {
                                 Image(systemName: "xmark")
                                     .font(.system(size: 9, weight: .bold))
-                                    .foregroundStyle(RDAlbum.C.textTertiary)
+                                    .foregroundStyle(selected ? Color.white.opacity(0.78) : RD.Palette.textTertiary)
                             }
                             .buttonStyle(.plain)
                         }
-                        .padding(.horizontal, 14)
-                        .frame(height: 36)
-                        .rdAlbumGlass(Capsule(style: .continuous), kind: .secondary, shadow: false)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 7)
+                        .foregroundStyle(selected ? .white : RD.Palette.textPrimary.opacity(0.88))
+                                .background {
+                                    if selected {
+                                        RDGemFacetSurface(shape: Capsule(style: .continuous), shadowRadius: 4, borderWidth: 0.8)
+                                    } else {
+                                        Capsule()
+                                            .fill(RD.Palette.surfaceRaised)
+                                            .overlay(Capsule().strokeBorder(RD.Gem.cardBorderGradient, lineWidth: 0.7))
+                                    }
+                                }
                     }
                 }
-                .padding(.horizontal, leadingPad)
-                .padding(.vertical, 2)
+                .padding(.leading, leadingPad)
+                .padding(.trailing, trailingPad)
             }
         }
     }
 
-    private func hotSearchBoard(wide: Bool, leadingPad: CGFloat, trailingPad: CGFloat) -> some View {
-        VStack(alignment: .leading, spacing: RDAlbum.Space.sm) {
-            RDAlbumSectionHeader(title: "热门搜索", trailing: "实时", showsChevron: false)
-                .padding(.horizontal, leadingPad)
+    private func quickChips(leadingPad: CGFloat, trailingPad: CGFloat) -> some View {
+        VStack(alignment: .leading, spacing: RD.Space.sm) {
+            RDSectionHeader(title: "热门搜索", showsChevron: false, accentMark: true)
+                .padding(.leading, leadingPad)
+                .padding(.trailing, trailingPad)
 
-            LazyVGrid(
-                columns: [
-                    GridItem(.flexible(), spacing: 12, alignment: .leading),
-                    GridItem(.flexible(), spacing: 12, alignment: .leading)
-                ],
-                alignment: .leading,
-                spacing: 4
-            ) {
-                ForEach(Array(hotWords.enumerated()), id: \.offset) { idx, word in
-                    let rank = idx + 1
-                    let top = rank <= 3
-                    Button {
-                        RDHaptics.shared.playChipSelect()
-                        query = word
-                        searchFocused = false
-                        chrome.setBrowseChromeHidden(false, reason: "searchTyping")
-                        runSearch()
-                    } label: {
-                        HStack(spacing: 10) {
-                            Text("\(rank)")
-                                .font(RDAlbum.Font.rounded(14, .semibold))
-                                .monospacedDigit()
-                                .foregroundStyle(top ? RDAlbum.C.textPrimary : RDAlbum.C.textTertiary)
-                                .frame(width: 18, alignment: .trailing)
-                            Text(word)
-                                .font(RDAlbum.Font.rounded(14, top ? .semibold : .regular))
-                                .foregroundStyle(top ? RDAlbum.C.textPrimary : RDAlbum.C.textTertiary)
-                                .lineLimit(1)
-                            Spacer(minLength: 0)
-                            if top {
-                                Circle()
-                                    .fill(RDAlbum.C.accentDot)
-                                    .frame(width: 5, height: 5)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(quick, id: \.self) { word in
+                        let selected = query.trimmingCharacters(in: .whitespacesAndNewlines) == word
+                        Button(word) {
+                            RDHaptics.shared.playChipSelect()
+                            query = word
+                            searchFocused = false
+                            runSearch()
+                        }
+                        .font(RD.Font.caption.weight(.semibold))
+                        .padding(.horizontal, 13)
+                        .padding(.vertical, 7)
+                        .foregroundStyle(selected ? .white : RD.Palette.textPrimary.opacity(0.86))
+                        .background {
+                            if selected {
+                                RDGemFacetSurface(shape: Capsule(style: .continuous), shadowRadius: 4, borderWidth: 0.8)
+                            } else {
+                                Capsule()
+                                    .fill(RD.Palette.surfaceRaised)
+                                    .overlay(Capsule().strokeBorder(RD.Gem.cardBorderGradient, lineWidth: 0.7))
                             }
                         }
-                        .frame(height: 38)
-                        .contentShape(Rectangle())
+                        .buttonStyle(RDPosterButtonStyle())
                     }
-                    .buttonStyle(.plain)
                 }
+                .padding(.leading, leadingPad)
+                .padding(.trailing, trailingPad)
             }
-            .padding(14)
-            .rdAlbumGlass(RoundedRectangle(cornerRadius: RDAlbum.Radius.hero, style: .continuous), kind: .secondary, shadow: false)
-            .padding(.horizontal, leadingPad)
         }
     }
 
-    private func suggestionBoard(leadingPad: CGFloat, trailingPad: CGFloat) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            RDAlbumSectionHeader(title: "搜索联想", trailing: "\(suggestions.count) 条", showsChevron: false)
-                .padding(.horizontal, leadingPad)
-
-            VStack(spacing: 0) {
-                ForEach(Array(suggestions.enumerated()), id: \.element.id) { idx, s in
-                    if let series = seriesFromSuggestion(s) {
-                        NavigationLink(value: series) {
-                            HStack(spacing: 12) {
-                                RDGemPlayMark(size: 20)
-                                Text(s.text)
-                                    .font(RDAlbum.Font.plateName)
-                                    .foregroundStyle(RDAlbum.C.textPrimary)
-                                    .lineLimit(1)
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .font(.system(size: 11, weight: .semibold))
-                                    .foregroundStyle(RDAlbum.C.textTertiary)
-                            }
-                            .padding(.horizontal, 16)
-                            .frame(height: 50)
-                            .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.plain)
-                        if idx < suggestions.count - 1 {
-                            Divider().background(RDAlbum.C.textTertiary.opacity(0.18)).padding(.leading, 48)
-                        }
-                    }
-                }
-            }
-            .rdAlbumGlass(RoundedRectangle(cornerRadius: RDAlbum.Radius.hero, style: .continuous), kind: .secondary, shadow: false)
-            .padding(.horizontal, leadingPad)
-        }
-    }
-
-    // MARK: - 结果内容
+    // MARK: - 搜索内容区
 
     @ViewBuilder
-    private func resultContent(wide: Bool, contentWidth: CGFloat, leadingPad: CGFloat, trailingPad: CGFloat) -> some View {
+    private func content(wide: Bool, contentWidth: CGFloat, leadingPad: CGFloat, trailingPad: CGFloat) -> some View {
         if loading {
-            VStack(alignment: .leading, spacing: RDAlbum.Space.md) {
-                RDAlbumSectionHeader(title: "正在检索", showsChevron: false)
-                    .padding(.horizontal, leadingPad)
+            VStack(alignment: .leading, spacing: RD.Space.md) {
+                RDSectionHeader(title: "正在检索", showsChevron: false, accentMark: true)
                 RDSearchSkeletonView(contentWidth: contentWidth)
-                    .padding(.horizontal, leadingPad)
             }
+            .padding(.leading, leadingPad)
+            .padding(.trailing, trailingPad)
         } else if let error, results.isEmpty && suggestions.isEmpty {
-            emptyBoard(
-                icon: "wifi.exclamationmark",
+            RDEmptyStateView(
+                systemImage: "wifi.exclamationmark",
                 title: "搜索暂时失败",
                 subtitle: error,
-                action: ("重试", {
-                    RDHaptics.shared.playRetryTap()
-                    runSearch()
-                }),
-                leadingPad: leadingPad
-            )
+                actionTitle: "重试"
+            ) {
+                RDHaptics.shared.playRetryTap()
+                runSearch()
+            }
+            .padding(.leading, leadingPad)
+            .padding(.trailing, trailingPad)
         } else if !results.isEmpty {
-            let spacing: CGFloat = wide ? 16 : 14
-            let columns = wide ? 5 : 2
-            let available = wide ? contentWidth : contentWidth
-            let cardWidth = max(80, (available - spacing * CGFloat(columns - 1)) / CGFloat(columns))
-            VStack(alignment: .leading, spacing: RDAlbum.Space.md) {
-                RDAlbumSectionHeader(title: "搜索结果", trailing: "共 \(results.count) 部", showsChevron: false)
-                    .padding(.horizontal, leadingPad)
-
-                LazyVGrid(
-                    columns: Array(repeating: GridItem(.flexible(), spacing: spacing, alignment: .top), count: columns),
-                    alignment: .leading,
-                    spacing: wide ? 24 : 22
-                ) {
+            let cols = RD.gridColumns(
+                contentWidth: contentWidth,
+                minCardWidth: wide ? 132 : 108,
+                spacing: RD.Space.md
+            )
+            VStack(alignment: .leading, spacing: RD.Space.md) {
+                RDSectionHeader(title: "搜索结果", trailing: "共 \(results.count) 部", showsChevron: false, accentMark: true)
+                LazyVGrid(columns: cols, alignment: .leading, spacing: RD.Space.lg) {
                     ForEach(results) { item in
                         NavigationLink(value: item) {
-                            RDAlbumPosterCard(
-                                series: item,
-                                width: cardWidth,
-                                plateHeight: RDAlbum.Poster.plateMedium,
-                                badge: item.isJustUpdated ? "更新" : (item.isCompleted ? "完结" : nil)
-                            )
+                            SeriesCard(series: item)
+                                .frame(maxWidth: .infinity, alignment: .topLeading)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(RDPosterButtonStyle())
                     }
                 }
-                .padding(.horizontal, leadingPad)
             }
+            .padding(.leading, leadingPad)
+            .padding(.trailing, trailingPad)
         } else if !suggestions.isEmpty {
-            suggestionBoard(leadingPad: leadingPad, trailingPad: trailingPad)
-        } else if searched {
-            emptyBoard(
-                icon: "questionmark.folder",
-                title: "没有找到相关漫剧",
-                subtitle: "换个剧名或关键词试试，也可以点击上方热门搜索",
-                action: nil,
-                leadingPad: leadingPad
-            )
-        } else {
-            emptyBoard(
-                icon: "text.magnifyingglass",
-                title: "输入剧名开始探索",
-                subtitle: "支持剧名、题材与热搜关键词直达详情",
-                action: nil,
-                leadingPad: leadingPad
-            )
-        }
-    }
-
-    private func emptyBoard(
-        icon: String,
-        title: String,
-        subtitle: String,
-        action: (String, () -> Void)?,
-        leadingPad: CGFloat
-    ) -> some View {
-        VStack(spacing: 12) {
-            Image(systemName: icon)
-                .font(.system(size: 28, weight: .light))
-                .foregroundStyle(RDAlbum.C.textTertiary)
-            Text(title)
-                .font(RDAlbum.Font.rowTitle)
-                .foregroundStyle(RDAlbum.C.textPrimary)
-            Text(subtitle)
-                .font(RDAlbum.Font.body)
-                .foregroundStyle(RDAlbum.C.textSecondary)
-                .multilineTextAlignment(.center)
-                .frame(maxWidth: 320)
-            if let action {
-                Button(action.0, action: action.1)
-                    .buttonStyle(RDAlbumGlassPillStyle(height: 40, horizontalPadding: 22))
+            VStack(alignment: .leading, spacing: 10) {
+                RDSectionHeader(title: "搜索联想", trailing: "\(suggestions.count) 条", showsChevron: false, accentMark: true)
+                Text("搜索 tab 接口当前返回空包，已用官方 cue 联想兜底，点条目进入详情。")
+                    .font(.caption2)
+                    .foregroundStyle(RD.Palette.textTertiary)
+                VStack(spacing: 0) {
+                    ForEach(Array(suggestions.enumerated()), id: \.element.id) { idx, s in
+                        if let series = seriesFromSuggestion(s) {
+                            NavigationLink(value: series) {
+                                HStack(spacing: 12) {
+                                    RDGemPlayMark(size: 20)
+                                    Text(s.text)
+                                        .font(RD.Font.headline)
+                                        .foregroundStyle(RD.Palette.textPrimary)
+                                        .lineLimit(1)
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .font(.caption.weight(.bold))
+                                        .foregroundStyle(RD.Palette.platinum.opacity(0.75))
+                                }
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 14)
+                                .contentShape(Rectangle())
+                            }
+                            .buttonStyle(RDPosterButtonStyle())
+                            if idx < suggestions.count - 1 {
+                                Divider().background(RD.Palette.hairline).padding(.leading, 48)
+                            }
+                        }
+                    }
+                }
+                .rdGemCard(radius: RD.Radius.card, fill: RD.Palette.surface)
             }
+            .padding(.leading, leadingPad)
+            .padding(.trailing, trailingPad)
+        } else if searched {
+            RDEmptyStateView(
+                systemImage: "questionmark.folder",
+                title: "没有找到相关漫剧",
+                subtitle: "换个剧名或关键词试试，也可以点击上方热门搜索"
+            )
+            .padding(.leading, leadingPad)
+            .padding(.trailing, trailingPad)
+        } else {
+            RDEmptyStateView(
+                systemImage: "text.magnifyingglass",
+                title: "输入剧名开始探索",
+                subtitle: "支持剧名、题材与热搜关键词直达详情（aid=8704）"
+            )
+            .padding(.leading, leadingPad)
+            .padding(.trailing, trailingPad)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 36)
-        .padding(.horizontal, 24)
-        .background {
-            RoundedRectangle(cornerRadius: RDAlbum.Radius.hero, style: .continuous)
-                .fill(rdAlbumAdaptiveGlassFill())
-        }
-        .padding(.horizontal, leadingPad)
     }
 
     private func seriesFromSuggestion(_ s: SearchSuggestion) -> Series? {
@@ -495,8 +398,6 @@ struct SearchView: View {
         let q = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !q.isEmpty, !loading else { return }
         SearchHistoryStore.shared.add(q)
-        searchFocused = false
-        chrome.setBrowseChromeHidden(false, reason: "searchTyping")
         loading = true
         error = nil
         searched = true
@@ -519,12 +420,4 @@ struct SearchView: View {
             loading = false
         }
     }
-}
-
-private func rdAlbumAdaptiveGlassFill() -> Color {
-    Color(uiColor: UIColor { traits in
-        traits.userInterfaceStyle == .dark
-            ? UIColor.white.withAlphaComponent(0.12)
-            : UIColor.white.withAlphaComponent(0.62)
-    })
 }

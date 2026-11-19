@@ -22,9 +22,8 @@ struct SwipeAdjacentPreviewCard: View {
 
             VStack(spacing: 12) {
                 RemoteCover(url: episode.cover.isEmpty ? fallbackCover : episode.cover, thumbnailMaxPixel: 600)
-                    .frame(width: 118, height: 157)
-                    .clipShape(RoundedRectangle(cornerRadius: RDAlbum.Radius.poster, style: .continuous))
-                    .shadow(color: RDAlbum.C.posterShadow, radius: 20, x: 0, y: 10)
+                    .frame(width: 118, height: 172)
+                    .rdGemPosterChrome()
 
                 RDBadgePill(text: isNext ? "下一集" : "上一集", accent: crossedThreshold)
 
@@ -53,20 +52,14 @@ struct SwipeAdjacentPreviewCard: View {
     }
 }
 
-// MARK: - A6 / 1.4.8: 屏内浮层选集抽屉（玻璃浮板 + 横滑胶囊带 + 倍速/离线/听剧/画中画胶囊）
+// MARK: - A6: 屏内浮层选集抽屉（自动定位当前集）
 
 struct PlayerEpisodeDrawer: View {
     let series: Series
     let episodes: [Episode]
     let currentIndex: Int
-    let currentRate: Float
     let isLandscapeOrWide: Bool
-    let isAudioMode: Bool
-    let isPiPPossible: Bool
     let onSelect: (Int) -> Void
-    let onSelectRate: (Float) -> Void
-    let onToggleAudioMode: () -> Void
-    let onTogglePiP: () -> Void
     let onCacheNext10: () -> Void
     let onCacheAll: () -> Void
     let onClose: () -> Void
@@ -82,14 +75,8 @@ struct PlayerEpisodeDrawer: View {
         series: Series,
         episodes: [Episode],
         currentIndex: Int,
-        currentRate: Float,
         isLandscapeOrWide: Bool,
-        isAudioMode: Bool,
-        isPiPPossible: Bool,
         onSelect: @escaping (Int) -> Void,
-        onSelectRate: @escaping (Float) -> Void,
-        onToggleAudioMode: @escaping () -> Void,
-        onTogglePiP: @escaping () -> Void,
         onCacheNext10: @escaping () -> Void,
         onCacheAll: @escaping () -> Void,
         onClose: @escaping () -> Void
@@ -97,14 +84,8 @@ struct PlayerEpisodeDrawer: View {
         self.series = series
         self.episodes = episodes
         self.currentIndex = currentIndex
-        self.currentRate = currentRate
         self.isLandscapeOrWide = isLandscapeOrWide
-        self.isAudioMode = isAudioMode
-        self.isPiPPossible = isPiPPossible
         self.onSelect = onSelect
-        self.onSelectRate = onSelectRate
-        self.onToggleAudioMode = onToggleAudioMode
-        self.onTogglePiP = onTogglePiP
         self.onCacheNext10 = onCacheNext10
         self.onCacheAll = onCacheAll
         self.onClose = onClose
@@ -123,12 +104,52 @@ struct PlayerEpisodeDrawer: View {
         let visible = lo < hi ? Array(episodes[lo..<hi]) : []
 
         VStack(alignment: .leading, spacing: 12) {
-            headerRow
+            // 标题栏
+            HStack(spacing: 10) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("选集 · \(series.title)")
+                        .font(RD.Font.headline.weight(.bold))
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                    Text("当前第 \(episodes[safe: currentIndex]?.index ?? 1) 集 / 共 \(episodes.count) 集 · 已缓存 \(offline.cachedCount(for: series.id, episodes: episodes)) 集")
+                        .font(.caption2)
+                        .foregroundStyle(RD.Palette.textSecondary)
+                        .lineLimit(1)
+                }
+                Spacer(minLength: 8)
+                Button(action: onClose) {
+                    Image(systemName: "xmark")
+                        .font(.caption.bold())
+                        .foregroundStyle(.white)
+                        .frame(width: 30, height: 30)
+                        .background(Color.white.opacity(0.12), in: Circle())
+                }
+            }
 
-            quickCapsules
+            // 离线追剧快捷入口
+            HStack(spacing: 8) {
+                Button(action: onCacheNext10) {
+                    Label("存后10集", systemImage: "arrow.down.circle.fill")
+                        .font(.caption.bold())
+                }
+                .buttonStyle(RDGemSecondaryButtonStyle(capsule: true, horizontalPadding: 11, verticalPadding: 6))
 
-            rateCapsules
+                Button(action: onCacheAll) {
+                    Label("存全集", systemImage: "tray.and.arrow.down.fill")
+                        .font(.caption.bold())
+                }
+                .buttonStyle(RDGemSecondaryButtonStyle(capsule: true, horizontalPadding: 11, verticalPadding: 6))
 
+                Spacer(minLength: 0)
+                if let batchTitle = offline.activeBatchTitle {
+                    Text("\(offline.batchDoneCount)/\(offline.batchTotalCount) · \(batchTitle)")
+                        .font(.caption2)
+                        .foregroundStyle(RD.Palette.gemRim)
+                        .lineLimit(1)
+                }
+            }
+
+            // 分段胶囊
             if rangeCount > 1 {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
@@ -137,45 +158,79 @@ struct PlayerEpisodeDrawer: View {
                             let end = min((i + 1) * rangeSize, episodes.count)
                             Button {
                                 RDHaptics.shared.playRangeTabSwitch()
-                                withAnimation(RDAlbum.Motion.rearrange) { rangeIndex = i }
+                                withAnimation(RD.Motion.snappy) { rangeIndex = i }
                             } label: {
                                 Text("\(start)-\(end)")
-                                    .font(RDAlbum.Font.rounded(12, .semibold))
-                                    .monospacedDigit()
-                                    .foregroundStyle(i == safeRange ? RDAlbum.C.inverse : .white.opacity(0.82))
+                                    .font(RD.Font.caption.weight(.bold))
                                     .padding(.horizontal, 12)
-                                    .frame(height: 30)
+                                    .padding(.vertical, 6)
+                                    .foregroundStyle(i == safeRange ? .white : RD.Palette.textSecondary)
                                     .background {
                                         if i == safeRange {
-                                            Capsule(style: .continuous).fill(Color.white)
+                                            RDGemFacetSurface(shape: Capsule(), shadowRadius: 5, borderWidth: 0.8)
                                         } else {
-                                            Capsule(style: .continuous).fill(Color.white.opacity(0.10))
+                                            Capsule()
+                                                .fill(RD.Palette.surfaceRaised)
+                                                .overlay(Capsule().strokeBorder(RD.Palette.hairline, lineWidth: 0.6))
                                         }
                                     }
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(RDPosterButtonStyle())
                         }
                     }
                 }
             }
 
-            // 选集横滑胶囊带（禁用方格选集）
+            // 选集网格 + 自动定位当前集
             ScrollViewReader { proxy in
-                ScrollView(.horizontal, showsIndicators: false) {
-                    LazyHStack(spacing: 10) {
+                ScrollView {
+                    let cols = Array(repeating: GridItem(.flexible(), spacing: 8), count: isLandscapeOrWide ? 4 : 5)
+                    LazyVGrid(columns: cols, spacing: 8) {
                         ForEach(visible) { ep in
                             let epIdx = episodes.firstIndex(where: { $0.vid == ep.vid }) ?? 0
                             let isCurrent = epIdx == currentIndex
                             let watched = prefs.isEpisodeWatched(seriesID: series.id, episodeIndex: ep.index)
-                            let state: RDAlbumEpisodeState = isCurrent ? .current : (watched ? .watched : .unwatched)
-                            RDAlbumEpisodeCapsule(
-                                index: ep.index,
-                                state: state,
-                                cached: offline.isCached(ep.vid) || preloader.isPrepared(ep.vid)
-                            ) {
+                            let cached = offline.isCached(ep.vid)
+                            let preloaded = preloader.isPrepared(ep.vid)
+
+                            Button {
                                 RDHaptics.shared.playEpisodeCellTap(watched: watched || isCurrent)
                                 onSelect(epIdx)
+                            } label: {
+                                ZStack(alignment: .topTrailing) {
+                                    VStack(spacing: 2) {
+                                        Text("\(ep.index)")
+                                            .font(RD.Font.headline.monospacedDigit())
+                                            .foregroundStyle(isCurrent ? .white : (watched ? RD.Palette.textSecondary : .white))
+                                        if isCurrent {
+                                            Text("播放中")
+                                                .font(.system(size: 8, weight: .bold))
+                                                .foregroundStyle(.white.opacity(0.92))
+                                        }
+                                    }
+                                    .frame(maxWidth: .infinity, minHeight: 46)
+                                    .background {
+                                        if isCurrent {
+                                            RDGemFacetSurface(shape: RoundedRectangle(cornerRadius: RD.Radius.control, style: .continuous), shadowRadius: 6, borderWidth: 1.0)
+                                        } else {
+                                            RoundedRectangle(cornerRadius: RD.Radius.control, style: .continuous)
+                                                .fill(RD.Palette.surfaceRaised)
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: RD.Radius.control, style: .continuous)
+                                                        .strokeBorder(RD.Palette.hairline, lineWidth: 0.6)
+                                                )
+                                        }
+                                    }
+
+                                    if cached || preloaded {
+                                        Image(systemName: cached ? "arrow.down.circle.fill" : "bolt.fill")
+                                            .font(.system(size: 9))
+                                            .foregroundStyle(cached ? RD.Palette.pearl : RD.Palette.platinum)
+                                            .padding(4)
+                                    }
+                                }
                             }
+                            .buttonStyle(RDPosterButtonStyle())
                             .id(ep.vid)
                         }
                     }
@@ -185,124 +240,34 @@ struct PlayerEpisodeDrawer: View {
                     syncRangeToCurrent()
                     if let cur = episodes[safe: currentIndex] {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) {
-                            proxy.scrollTo(cur.vid, anchor: .center)
+                            withAnimation(RD.Motion.snappy) {
+                                proxy.scrollTo(cur.vid, anchor: .center)
+                            }
                         }
                     }
                 }
                 .onChange(of: currentIndex) { _, newIdx in
                     syncRangeToCurrent(index: newIdx)
                     if let cur = episodes[safe: newIdx] {
-                        withAnimation(RDAlbum.Motion.rearrange) {
+                        withAnimation(RD.Motion.snappy) {
                             proxy.scrollTo(cur.vid, anchor: .center)
                         }
                     }
                 }
             }
-
-            Spacer(minLength: 0)
         }
-        .padding(18)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: RDAlbum.Radius.board, style: .continuous))
+        .padding(16)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: RD.Radius.sheet, style: .continuous))
         .background(
-            RoundedRectangle(cornerRadius: RDAlbum.Radius.board, style: .continuous)
-                .fill(Color(rdHex: 0x15161D, opacity: 0.78))
+            RoundedRectangle(cornerRadius: RD.Radius.sheet, style: .continuous)
+                .fill(RD.Palette.background.opacity(0.82))
         )
         .overlay(
-            RoundedRectangle(cornerRadius: RDAlbum.Radius.board, style: .continuous)
-                .strokeBorder(Color.white.opacity(0.12), lineWidth: 0.8)
+            RoundedRectangle(cornerRadius: RD.Radius.sheet, style: .continuous)
+                .strokeBorder(RD.Gem.cardBorderGradient, lineWidth: 0.9)
         )
         .environment(\.colorScheme, .dark)
-        .shadow(color: .black.opacity(0.5), radius: 28, x: 0, y: 12)
-    }
-
-    private var headerRow: some View {
-        HStack(spacing: 10) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text("选集 · \(series.title)")
-                    .font(RDAlbum.Font.rounded(17, .semibold))
-                    .foregroundStyle(RDAlbum.C.mediaPrimary)
-                    .lineLimit(1)
-                Text("当前第 \(episodes[safe: currentIndex]?.index ?? 1) 集 / 共 \(episodes.count) 集 · 已缓存 \(offline.cachedCount(for: series.id, episodes: episodes)) 集")
-                    .font(RDAlbum.Font.plateSub)
-                    .foregroundStyle(RDAlbum.C.mediaSecondary)
-                    .lineLimit(1)
-            }
-            Spacer(minLength: 8)
-            Button(action: onClose) {
-                Image(systemName: "xmark")
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(RDAlbum.C.mediaPrimary)
-                    .frame(width: 32, height: 32)
-                    .background(Color.white.opacity(0.12), in: Circle())
-            }
-            .buttonStyle(.plain)
-        }
-    }
-
-    private var quickCapsules: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                Button(action: onCacheNext10) {
-                    Label("存后10集", systemImage: "arrow.down.circle.fill")
-                }
-                .buttonStyle(RDAlbumGlassPillStyle(height: 32, horizontalPadding: 12, mediaOverlay: true))
-
-                Button(action: onCacheAll) {
-                    Label("存全集", systemImage: "tray.and.arrow.down.fill")
-                }
-                .buttonStyle(RDAlbumGlassPillStyle(height: 32, horizontalPadding: 12, mediaOverlay: true))
-
-                Button(action: onToggleAudioMode) {
-                    Label(isAudioMode ? "听剧中" : "听剧", systemImage: isAudioMode ? "headphones.circle.fill" : "headphones")
-                }
-                .buttonStyle(RDAlbumGlassPillStyle(height: 32, horizontalPadding: 12, mediaOverlay: true))
-
-                if isPiPPossible {
-                    Button(action: onTogglePiP) {
-                        Label("画中画", systemImage: "pip.enter")
-                    }
-                    .buttonStyle(RDAlbumGlassPillStyle(height: 32, horizontalPadding: 12, mediaOverlay: true))
-                }
-
-                if let batchTitle = offline.activeBatchTitle {
-                    Text("\(offline.batchDoneCount)/\(offline.batchTotalCount) · \(batchTitle)")
-                        .font(RDAlbum.Font.plateSub)
-                        .foregroundStyle(RD.Palette.gemRim)
-                        .lineLimit(1)
-                }
-            }
-        }
-    }
-
-    private var rateCapsules: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                Text("倍速")
-                    .font(RDAlbum.Font.plateSub)
-                    .foregroundStyle(RDAlbum.C.mediaSecondary)
-                ForEach(RDPlaybackPrefs.supportedRates, id: \.self) { rate in
-                    let selected = abs(currentRate - rate) < 0.01
-                    Button {
-                        onSelectRate(rate)
-                    } label: {
-                        Text(RDPlaybackPrefs.rateLabel(rate))
-                            .font(RDAlbum.Font.rounded(12, .semibold))
-                            .monospacedDigit()
-                            .foregroundStyle(selected ? RDAlbum.C.inverse : .white.opacity(0.84))
-                            .padding(.horizontal, 12)
-                            .frame(height: 30)
-                            .background {
-                                if selected {
-                                    Capsule(style: .continuous).fill(Color.white)
-                                } else {
-                                    Capsule(style: .continuous).fill(Color.white.opacity(0.10))
-                                }
-                            }
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-        }
+        .shadow(color: .black.opacity(0.6), radius: 18, y: 6)
     }
 
     private func syncRangeToCurrent(index: Int? = nil) {
@@ -311,7 +276,7 @@ struct PlayerEpisodeDrawer: View {
     }
 }
 
-// MARK: - A2 / 1.4.8: Duo 半折「追剧台」常驻控制面板（顶大丸 + 常驻选集/倍速/离线胶囊）
+// MARK: - A2: Duo 半折「追剧台」常驻控制面板（严格避开折痕）
 
 struct DuoBingeWorkbench: View {
     let series: Series
@@ -344,30 +309,28 @@ struct DuoBingeWorkbench: View {
 
     var body: some View {
         ZStack {
-            Color(rdHex: 0x0C0C0F)
+            RD.Palette.background
 
-            ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 14) {
-                    headerRow
-                    bigTransportPill
-                    quickControlPills
-                    nextEpisodeCard
-                    rateRow
-                    episodeBand
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 12) {
+                        headerRow
+                        transportAndProgressCard
+                        quickControlPills
+                        episodeGridSection(proxy: proxy)
+                    }
+                    .padding(14)
                 }
-                .padding(14)
-                .padding(.bottom, 8)
             }
         }
-        .environment(\.colorScheme, .dark)
     }
 
     private var headerRow: some View {
         HStack(spacing: 8) {
-            RDBadgePill(text: isPhysicalFold ? "Duo 半折追剧台" : "追剧台", accent: true)
+            RDBadgePill(text: isPhysicalFold ? "Duo 半折追剧台" : "双屏追剧台", accent: true)
             Text(series.title)
-                .font(RDAlbum.Font.rounded(15, .semibold))
-                .foregroundStyle(RDAlbum.C.mediaPrimary)
+                .font(RD.Font.headline.weight(.bold))
+                .foregroundStyle(.white)
                 .lineLimit(1)
             Spacer(minLength: 4)
             if let nextEp = episodes[safe: currentIndex + 1], preloader.isPrepared(nextEp.vid) {
@@ -375,94 +338,115 @@ struct DuoBingeWorkbench: View {
             }
             if let onExitWorkbench {
                 Button(action: onExitWorkbench) {
-                    Text("全屏")
-                        .font(RDAlbum.Font.rounded(11, .semibold))
-                        .foregroundStyle(RDAlbum.C.mediaSecondary)
-                        .padding(.horizontal, 10)
-                        .frame(height: 26)
-                        .background(Color.white.opacity(0.10), in: Capsule())
+                    Text("收起台")
+                        .font(.caption2.bold())
+                        .foregroundStyle(RD.Palette.textSecondary)
+                        .padding(.horizontal, 9)
+                        .padding(.vertical, 4)
+                        .background(RD.Palette.surfaceRaised, in: Capsule())
                 }
-                .buttonStyle(.plain)
             }
         }
     }
 
-    /// 追剧台顶大丸：高 64、宽 -40。
-    private var bigTransportPill: some View {
-        HStack(spacing: 12) {
-            Button(action: onPrev) {
-                Image(systemName: "backward.end.fill")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .frame(width: 36, height: 36)
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .disabled(currentIndex <= 0)
-            .opacity(currentIndex <= 0 ? 0.38 : 1)
+    private var transportAndProgressCard: some View {
+        VStack(spacing: 10) {
+            HStack(spacing: 10) {
+                Button(action: onPrev) {
+                    Image(systemName: "backward.end.fill")
+                        .frame(width: 34, height: 34)
+                }
+                .disabled(currentIndex <= 0)
+                .opacity(currentIndex <= 0 ? 0.4 : 1)
 
-            Button(action: onPlayPause) {
-                ZStack {
-                    Circle()
-                        .fill(Color.white)
-                        .frame(width: 44, height: 44)
+                Button(action: onPlayPause) {
                     Image(systemName: isPlaying ? "pause.fill" : "play.fill")
                         .font(.system(size: 16, weight: .bold))
-                        .foregroundStyle(RDAlbum.C.inverse)
-                        .offset(x: isPlaying ? 0 : 1)
+                        .foregroundStyle(.white)
+                        .frame(width: 40, height: 36)
+                        .background {
+                            RDGemFacetSurface(
+                                shape: RoundedRectangle(cornerRadius: 9, style: .continuous),
+                                shadowRadius: 6,
+                                borderWidth: 0.9
+                            )
+                        }
                 }
-                .frame(width: 48, height: 48)
-                .contentShape(Circle())
-            }
-            .buttonStyle(.plain)
 
-            Button(action: onNext) {
-                Image(systemName: "forward.end.fill")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .frame(width: 36, height: 36)
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .disabled(currentIndex >= episodes.count - 1)
-            .opacity(currentIndex >= episodes.count - 1 ? 0.38 : 1)
+                Button(action: onNext) {
+                    Image(systemName: "forward.end.fill")
+                        .frame(width: 34, height: 34)
+                }
+                .disabled(currentIndex >= episodes.count - 1)
+                .opacity(currentIndex >= episodes.count - 1 ? 0.4 : 1)
 
-            VStack(alignment: .leading, spacing: 1) {
-                RDAlbumScrubber(
-                    time: currentTime,
-                    duration: max(duration, 1),
+                let maxDur = max(duration, 1)
+                Slider(
+                    value: Binding(
+                        get: { min(max(currentTime, 0), maxDur) },
+                        set: { onSeek($0) }
+                    ),
+                    in: 0...maxDur,
                     onEditingChanged: { editing in
                         if editing {
                             RDHaptics.shared.playSliderGrab()
                         } else {
                             RDHaptics.shared.playSliderRelease()
                         }
-                    },
-                    onSeek: { onSeek($0) }
-                )
-                HStack(spacing: 4) {
-                    Text("\(HistoryEntry.formatTime(currentTime))")
-                        .foregroundStyle(RDAlbum.C.mediaPrimary)
-                    Spacer(minLength: 2)
-                    if abs(currentRate - 1.0) > 0.01 {
-                        Text(RDPlaybackPrefs.rateLabel(currentRate))
-                            .foregroundStyle(RD.Palette.gemRim)
-                        Spacer(minLength: 2)
                     }
-                    Text("\(HistoryEntry.formatTime(duration))")
-                        .foregroundStyle(RDAlbum.C.mediaSecondary)
+                )
+                .tint(RD.Palette.accent)
+
+                Text("\(HistoryEntry.formatTime(currentTime))/\(HistoryEntry.formatTime(duration))")
+                    .font(.caption2.monospacedDigit())
+                    .foregroundStyle(RD.Palette.textSecondary)
+            }
+            .foregroundStyle(.white)
+
+            // 倍速挡位 + 一键跳片头/跳片尾
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 6) {
+                    ForEach(RDPlaybackPrefs.supportedRates, id: \.self) { r in
+                        let selected = abs(currentRate - r) < 0.01
+                        Button {
+                            onSelectRate(r)
+                        } label: {
+                            Text(RDPlaybackPrefs.rateLabel(r))
+                                .font(.caption2.monospacedDigit().bold())
+                                .padding(.horizontal, 9)
+                                .padding(.vertical, 5)
+                                .foregroundStyle(selected ? .white : RD.Palette.textSecondary)
+                                .background {
+                                    if selected {
+                                        RDGemFacetSurface(shape: Capsule(), shadowRadius: 5, borderWidth: 0.8)
+                                    } else {
+                                        Capsule()
+                                            .fill(RD.Palette.surfaceRaised)
+                                            .overlay(Capsule().strokeBorder(RD.Palette.hairline, lineWidth: 0.6))
+                                    }
+                                }
+                        }
+                        .buttonStyle(RDPosterButtonStyle())
+                    }
+
+                    Divider().frame(height: 16).background(RD.Palette.hairline)
+
+                    Button(action: onSkipIntro) {
+                        Label("跳片头", systemImage: "forward.frame.fill")
+                            .font(.caption2.bold())
+                    }
+                    .buttonStyle(RDGemSecondaryButtonStyle(capsule: true, horizontalPadding: 9, verticalPadding: 5))
+
+                    Button(action: onSkipOutro) {
+                        Label("跳片尾", systemImage: "forward.end.alt.fill")
+                            .font(.caption2.bold())
+                    }
+                    .buttonStyle(RDGemSecondaryButtonStyle(capsule: true, horizontalPadding: 9, verticalPadding: 5))
                 }
-                .font(RDAlbum.Font.timecode.monospacedDigit())
             }
         }
-        .padding(.horizontal, 14)
-        .frame(height: 64)
-        .frame(maxWidth: .infinity)
-        .background(.ultraThinMaterial, in: Capsule(style: .continuous))
-        .background(Color(rdHex: 0x14151B, opacity: 0.68), in: Capsule(style: .continuous))
-        .overlay(Capsule(style: .continuous).strokeBorder(Color.white.opacity(0.18), lineWidth: 0.7))
-        .shadow(color: .black.opacity(0.5), radius: 28, x: 0, y: 12)
-        .padding(.horizontal, 6)
+        .padding(10)
+        .rdGemCard()
     }
 
     private var quickControlPills: some View {
@@ -496,94 +480,16 @@ struct DuoBingeWorkbench: View {
                 if isPiPPossible {
                     Button(action: onTogglePiP) {
                         Label("小窗", systemImage: "pip.enter")
+                            .font(.caption2.bold())
                     }
-                    .buttonStyle(RDAlbumGlassPillStyle(height: 32, horizontalPadding: 12, mediaOverlay: true))
+                    .buttonStyle(RDGemSecondaryButtonStyle(capsule: true, horizontalPadding: 10, verticalPadding: 6))
                 }
 
                 Button(action: onCacheNext10) {
                     Label("缓存后10集", systemImage: "arrow.down.circle")
+                        .font(.caption2.bold())
                 }
-                .buttonStyle(RDAlbumGlassPillStyle(height: 32, horizontalPadding: 12, mediaOverlay: true))
-
-                Button(action: onSkipIntro) {
-                    Label("跳片头", systemImage: "forward.frame.fill")
-                }
-                .buttonStyle(RDAlbumGlassPillStyle(height: 32, horizontalPadding: 12, mediaOverlay: true))
-
-                Button(action: onSkipOutro) {
-                    Label("跳片尾", systemImage: "forward.end.alt.fill")
-                }
-                .buttonStyle(RDAlbumGlassPillStyle(height: 32, horizontalPadding: 12, mediaOverlay: true))
-            }
-        }
-    }
-
-    /// 接下来连播卡（大屏右板 / 半折追剧台常驻）。
-    @ViewBuilder
-    private var nextEpisodeCard: some View {
-        if let next = episodes[safe: currentIndex + 1] {
-            Button {
-                RDHaptics.shared.playUpNextPlayNow()
-                onSelectEpisode(currentIndex + 1)
-            } label: {
-                HStack(spacing: 12) {
-                    RemoteCover(url: next.cover.isEmpty ? series.cover : next.cover, thumbnailMaxPixel: 240)
-                        .frame(width: 54, height: 72)
-                        .clipped()
-                        .clipShape(RoundedRectangle(cornerRadius: RDAlbum.Radius.thumb, style: .continuous))
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text("接下来")
-                            .font(RDAlbum.Font.rounded(10, .semibold))
-                            .tracking(1.2)
-                            .foregroundStyle(RDAlbum.C.mediaSecondary)
-                        Text("第 \(next.index) 集")
-                            .font(RDAlbum.Font.plateName)
-                            .foregroundStyle(RDAlbum.C.mediaPrimary)
-                            .lineLimit(1)
-                        Text(preloader.isPrepared(next.vid) ? "已备好 · 点播即看" : "点击直接播放")
-                            .font(RDAlbum.Font.plateSub)
-                            .foregroundStyle(RDAlbum.C.mediaTertiary)
-                    }
-                    Spacer(minLength: 0)
-                    RDAlbumPlayCircle(size: 34)
-                }
-                .padding(10)
-                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: RDAlbum.Radius.hero, style: .continuous))
-                .background(Color(rdHex: 0x14151B, opacity: 0.55), in: RoundedRectangle(cornerRadius: RDAlbum.Radius.hero, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: RDAlbum.Radius.hero, style: .continuous).strokeBorder(Color.white.opacity(0.12), lineWidth: 0.6))
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-        }
-    }
-
-    private var rateRow: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                Text("倍速")
-                    .font(RDAlbum.Font.plateSub)
-                    .foregroundStyle(RDAlbum.C.mediaSecondary)
-                ForEach(RDPlaybackPrefs.supportedRates, id: \.self) { r in
-                    let selected = abs(currentRate - r) < 0.01
-                    Button {
-                        onSelectRate(r)
-                    } label: {
-                        Text(RDPlaybackPrefs.rateLabel(r))
-                            .font(RDAlbum.Font.rounded(12, .semibold))
-                            .monospacedDigit()
-                            .foregroundStyle(selected ? RDAlbum.C.inverse : .white.opacity(0.84))
-                            .padding(.horizontal, 12)
-                            .frame(height: 30)
-                            .background {
-                                if selected {
-                                    Capsule(style: .continuous).fill(Color.white)
-                                } else {
-                                    Capsule(style: .continuous).fill(Color.white.opacity(0.10))
-                                }
-                            }
-                    }
-                    .buttonStyle(.plain)
-                }
+                .buttonStyle(RDGemSecondaryButtonStyle(capsule: true, horizontalPadding: 10, verticalPadding: 6))
             }
         }
     }
@@ -591,58 +497,84 @@ struct DuoBingeWorkbench: View {
     private func toggleChip(title: String, icon: String, isOn: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Label(title, systemImage: icon)
-                .font(RDAlbum.Font.rounded(11, .semibold))
-                .foregroundStyle(isOn ? RDAlbum.C.inverse : .white.opacity(0.84))
-                .padding(.horizontal, 12)
-                .frame(height: 32)
+                .font(.caption2.bold())
+                .foregroundStyle(isOn ? .white : RD.Palette.textSecondary)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
                 .background {
                     if isOn {
-                        Capsule(style: .continuous).fill(Color.white)
+                        RDGemFacetSurface(shape: Capsule(), shadowRadius: 5, borderWidth: 0.8)
                     } else {
-                        Capsule(style: .continuous).fill(Color.white.opacity(0.10))
-                            .overlay(Capsule(style: .continuous).strokeBorder(Color.white.opacity(0.12), lineWidth: 0.6))
+                        Capsule()
+                            .fill(RD.Palette.surfaceRaised)
+                            .overlay(Capsule().strokeBorder(RD.Palette.hairline, lineWidth: 0.7))
                     }
                 }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(RDPosterButtonStyle())
     }
 
-    private var episodeBand: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("常驻选集 · 第 \(episodes[safe: currentIndex]?.index ?? 1)/\(episodes.count) 集")
-                .font(RDAlbum.Font.rounded(12, .semibold))
-                .foregroundStyle(RDAlbum.C.mediaSecondary)
+    private func episodeGridSection(proxy: ScrollViewProxy) -> some View {
+        let cols = Array(repeating: GridItem(.flexible(), spacing: 7), count: isBookPosture ? 4 : 6)
+        return VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("常驻选集（第 \(episodes[safe: currentIndex]?.index ?? 1)/\(episodes.count) 集）")
+                    .font(RD.Font.caption.weight(.bold))
+                    .foregroundStyle(.white)
+                Spacer()
+            }
 
-            ScrollViewReader { proxy in
-                ScrollView(.horizontal, showsIndicators: false) {
-                    LazyHStack(spacing: 10) {
-                        ForEach(Array(episodes.enumerated()), id: \.element.vid) { idx, ep in
-                            let isCur = idx == currentIndex
-                            let watched = prefs.isEpisodeWatched(seriesID: series.id, episodeIndex: ep.index)
-                            let state: RDAlbumEpisodeState = isCur ? .current : (watched ? .watched : .unwatched)
-                            RDAlbumEpisodeCapsule(
-                                index: ep.index,
-                                state: state,
-                                cached: offline.isCached(ep.vid)
-                            ) {
-                                RDHaptics.shared.playEpisodeCellTap(watched: watched || isCur)
-                                onSelectEpisode(idx)
+            LazyVGrid(columns: cols, spacing: 7) {
+                ForEach(Array(episodes.enumerated()), id: \.element.vid) { idx, ep in
+                    let isCur = idx == currentIndex
+                    let watched = prefs.isEpisodeWatched(seriesID: series.id, episodeIndex: ep.index)
+                    let cached = offline.isCached(ep.vid)
+                    Button {
+                        RDHaptics.shared.playEpisodeCellTap(watched: watched || isCur)
+                        onSelectEpisode(idx)
+                    } label: {
+                        ZStack(alignment: .topTrailing) {
+                            Text("\(ep.index)")
+                                .font(RD.Font.caption.monospacedDigit().weight(.bold))
+                                .foregroundStyle(isCur ? .white : (watched ? RD.Palette.textSecondary : .white))
+                                .frame(maxWidth: .infinity, minHeight: 36)
+                                .background {
+                                    if isCur {
+                                        RDGemFacetSurface(
+                                            shape: RoundedRectangle(cornerRadius: 7, style: .continuous),
+                                            shadowRadius: 5,
+                                            borderWidth: 0.8
+                                        )
+                                    } else {
+                                        RoundedRectangle(cornerRadius: 7, style: .continuous)
+                                            .fill(RD.Palette.surfaceRaised)
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 7, style: .continuous)
+                                                    .strokeBorder(RD.Palette.hairline, lineWidth: 0.6)
+                                            )
+                                    }
+                                }
+                            if cached {
+                                Circle()
+                                    .fill(RD.Palette.pearl)
+                                    .frame(width: 5, height: 5)
+                                    .padding(4)
                             }
-                            .id(ep.vid)
                         }
                     }
-                    .padding(.vertical, 2)
+                    .buttonStyle(RDPosterButtonStyle())
+                    .id(ep.vid)
                 }
-                .onAppear {
-                    if let cur = episodes[safe: currentIndex] {
+            }
+            .onAppear {
+                if let cur = episodes[safe: currentIndex] {
+                    proxy.scrollTo(cur.vid, anchor: .center)
+                }
+            }
+            .onChange(of: currentIndex) { _, newIdx in
+                if let cur = episodes[safe: newIdx] {
+                    withAnimation(RD.Motion.snappy) {
                         proxy.scrollTo(cur.vid, anchor: .center)
-                    }
-                }
-                .onChange(of: currentIndex) { _, newIdx in
-                    if let cur = episodes[safe: newIdx] {
-                        withAnimation(RDAlbum.Motion.rearrange) {
-                            proxy.scrollTo(cur.vid, anchor: .center)
-                        }
                     }
                 }
             }
@@ -681,8 +613,8 @@ struct FinaleRelatedOverlay: View {
 
             if recommendations.isEmpty {
                 Text("暂无同题材推荐，可重播或返回首页探索更多好剧")
-                    .font(RDAlbum.Font.body)
-                    .foregroundStyle(RDAlbum.C.mediaSecondary)
+                    .font(RD.Font.body)
+                    .foregroundStyle(RD.Palette.textSecondary)
             } else {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
@@ -692,34 +624,33 @@ struct FinaleRelatedOverlay: View {
                                 onPickSeries(rec)
                             } label: {
                                 VStack(alignment: .leading, spacing: 6) {
-                                    RemoteCover(url: rec.cover)
-                                        .frame(width: 108, height: 144)
-                                        .clipped()
-                                        .clipShape(RoundedRectangle(cornerRadius: RDAlbum.Radius.poster, style: .continuous))
+                                    Color.clear
+                                        .frame(width: 108, height: 156)
+                                        .overlay { RemoteCover(url: rec.cover) }
                                         .overlay(alignment: .bottomTrailing) {
                                             Text("全\(rec.episodeCount)集")
-                                                .font(RDAlbum.Font.plateSub)
-                                                .foregroundStyle(RDAlbum.C.mediaPrimary)
-                                                .padding(.horizontal, 6)
+                                                .font(RD.Font.micro)
+                                                .foregroundStyle(.white)
+                                                .padding(.horizontal, 5)
                                                 .padding(.vertical, 2)
-                                                .background(Color.black.opacity(0.60), in: Capsule())
+                                                .background(.black.opacity(0.75), in: RoundedRectangle(cornerRadius: 4))
                                                 .padding(5)
                                         }
-                                        .shadow(color: RDAlbum.C.posterShadow, radius: 16, y: 8)
+                                        .rdGemPosterChrome()
                                     Text(rec.title)
-                                        .font(RDAlbum.Font.plateName)
-                                        .foregroundStyle(RDAlbum.C.mediaPrimary)
+                                        .font(RD.Font.caption.weight(.bold))
+                                        .foregroundStyle(.white)
                                         .lineLimit(1)
                                     if !rec.tags.isEmpty {
                                         Text(rec.tags.prefix(2).joined(separator: "·"))
-                                            .font(RDAlbum.Font.plateSub)
+                                            .font(.caption2)
                                             .foregroundStyle(RD.Palette.gemRim)
                                             .lineLimit(1)
                                     }
                                 }
                                 .frame(width: 108)
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(RDPosterButtonStyle())
                         }
                     }
                 }
@@ -729,7 +660,7 @@ struct FinaleRelatedOverlay: View {
                 Button(action: onReplay) {
                     Label("重播本集", systemImage: "arrow.counterclockwise")
                 }
-                .buttonStyle(RDAlbumGlassPillStyle(height: 42, horizontalPadding: 16, mediaOverlay: true))
+                .buttonStyle(RDGemSecondaryButtonStyle(capsule: false, horizontalPadding: 14, verticalPadding: 10))
 
                 if let first = recommendations.first {
                     Button {
@@ -739,20 +670,16 @@ struct FinaleRelatedOverlay: View {
                         Label("接档：\(first.title)", systemImage: "play.fill")
                             .lineLimit(1)
                     }
-                    .buttonStyle(RDAlbumPrimaryPillStyle(height: 42, horizontalPadding: 18))
+                    .buttonStyle(RDGemPrimaryButtonStyle(minHeight: 40, cornerRadius: 9))
                 } else {
                     Button("返回剧集", action: onClose)
-                        .buttonStyle(RDAlbumPrimaryPillStyle(height: 42, horizontalPadding: 18))
+                        .buttonStyle(RDGemPrimaryButtonStyle(minHeight: 40, cornerRadius: 9))
                 }
             }
         }
         .padding(18)
         .frame(maxWidth: 480)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: RDAlbum.Radius.board, style: .continuous))
-        .background(Color(rdHex: 0x15161D, opacity: 0.92), in: RoundedRectangle(cornerRadius: RDAlbum.Radius.board, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: RDAlbum.Radius.board, style: .continuous).strokeBorder(Color.white.opacity(0.12), lineWidth: 0.8))
-        .shadow(color: .black.opacity(0.5), radius: 28, x: 0, y: 12)
-        .environment(\.colorScheme, .dark)
+        .rdGemCard(radius: RD.Radius.sheet, fill: RD.Palette.surface.opacity(0.95), glow: true)
     }
 }
 
@@ -820,13 +747,9 @@ struct AudioModeCoverOverlay: View {
                             .frame(width: 44, height: 44)
                     }
                     Button(action: onTogglePlay) {
-                        ZStack {
-                            Circle().fill(Color.white).frame(width: 58, height: 58)
-                            Image(systemName: isPlaying ? "pause.fill" : "play.fill")
-                                .font(.system(size: 20, weight: .bold))
-                                .foregroundStyle(RDAlbum.C.inverse)
-                                .offset(x: isPlaying ? 0 : 1)
-                        }
+                        Image(systemName: isPlaying ? "pause.circle.fill" : "play.circle.fill")
+                            .font(.system(size: 58))
+                            .foregroundStyle(.white)
                     }
                     Button(action: onNext) {
                         Image(systemName: "forward.end.fill")
@@ -839,7 +762,7 @@ struct AudioModeCoverOverlay: View {
                 Button(action: onExitAudioMode) {
                     Label("恢复看画面", systemImage: "tv.fill")
                 }
-                .buttonStyle(RDAlbumGlassPillStyle(height: 40, horizontalPadding: 18, mediaOverlay: true))
+                .buttonStyle(RDGemSecondaryButtonStyle(capsule: true, horizontalPadding: 18, verticalPadding: 9))
 
                 Spacer(minLength: 20)
             }
