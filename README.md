@@ -97,7 +97,6 @@
 - 请求签名、取流与 CENC 解密链主要移植自 **iDuanJu**（GPL-3.0）；
 - 播放签名曾含与 **hongguo-open-player**（GPL-3.0-only）交叉核对的 551 方言，因未被调用已在本公开版中移除，仓库内不再含该项目代码；
 - 签名变换的早期血统来自 **OpenHongguo**（Apache-2.0）；
-- 工程骨架源自 **DouDuo**（MIT）；
 - 播放内核 **MobileVLCKit** 为 **LGPL-2.1-or-later**，由 VideoLAN 维护，构建时单独拉取、不随仓库分发。
 
 ## 致谢
@@ -105,7 +104,6 @@
 由衷感谢以下开源项目与作者，没有他们的公开工作就没有这个项目：
 
 - **[iDuanJu](https://github.com/my-name-is-alan/iDuanJu)**（作者 Alan 及贡献者）——本项目签名、取流、解密的核心实现来源；
-- **[DouDuo](https://github.com/81199000/DouDuo)**（作者 81199000）——工程骨架与播放器思路的来源；
 - **hongguo-open-player / OpenHongguo** 社区——签名算法的早期开源实现；
 - **[VideoLAN](https://www.videolan.org/) / MobileVLCKit**——强大的开源播放内核；
 - **hongguo-desktop、HGTV** 等同题材开源项目——接口行为对照参考。
